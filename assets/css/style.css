@@ -9,10 +9,12 @@ body {
     height: 100vh;
     display: flex;
     font-family: "Pixelify Sans", sans-serif;
+    letter-spacing: 2px;
+    font-size: 40px;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-color: black;
+    background-color: rgb(9, 8, 14);
 }
 
 header {
