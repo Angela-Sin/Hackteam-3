@@ -16,58 +16,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Difficulty settings
     const difficultySettings = {
-        easy: 5,
-        normal: 10,
-        hard: 15,
+        easy: 2,
+        normal: 5,
+        hard: 7,
     };
 
     let player;
     let playerSprite;
-
 
     // Player class
     class Player {
         constructor() {
             this.reset();
         }
-    
+
         reset() {
-
-            this.radius = 25;
-            this.x = this.radius;
-            this.y = this.radius;
-            this.speed = difficultySettings[selectedDifficulty];
-
             this.width = 70;
             this.height = 70;
             this.x = this.width / 2;
             this.y = this.height / 2;
-            this.speed = 5;                     // speed controller
-
+            this.speed = difficultySettings[selectedDifficulty];
             this.direction = 1;
-            this.verticalStep = this.height / 2;
+            this.verticalStep = this.height / 3;
             this.gameOver = false;
         }
-    
+
         draw() {
             ctx.drawImage(playerSprite, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-    
+
         update() {
-
             if (this.gameOver || !gameStarted) return;
-
-
-            if (this.gameOver) return;
-    
-
             this.x += this.speed * this.direction;
-    
+
             // Change direction and move down when reaching canvas boundaries
             if (this.x + this.width / 2 > canvas.width || this.x - this.width / 2 < 0) {
                 this.direction *= -1; // Reverse direction
                 this.y += this.verticalStep; // Move down
-    
+
                 // Stop the game if any part of the sprite touches the bottom
                 if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
@@ -77,70 +63,85 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // buildings
     const minHeight = 20;
     const buildingWidth = 20;
     const maxBuildingHeight = 150;
     const buildingGap = 3;
     const canvasEndGap = 10;
     const buildings = [];
-
+  
     class Building {
         constructor(x, width, health) {
             this.x = x;
             this.width = width;
             this.health = health;
-            this.maxHeight = this.calculateHeight();
-            this.currentHeight = this.maxHeight;
-            this.y = canvas.height - this.currentHeight;
+            this.maxHealth = health;
+            this.sprite = this.selectSprite();
+            this.spriteWidth = 48;
+            this.spriteHeight = 202;
+            this.scale = this.width / this.spriteWidth;
+            this.height = this.spriteHeight * this.scale;
+            this.y = canvas.height - this.height;
         }
-
-        calculateHeight() {
-            return minHeight + (this.health * (maxBuildingHeight - minHeight) / 3);
+    
+        selectSprite() {
+            if (this.health === 3) return tallBuildingSprite;
+            if (this.health === 2) return medBuildingSprite;
+            return smallBuildingSprite;
         }
-
+    
         draw() {
-            ctx.fillStyle = 'darkblue';
-            ctx.fillRect(this.x, this.y, this.width, this.currentHeight);
+            const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
+            ctx.drawImage(
+                this.sprite,
+                spriteX, 0,
+                this.spriteWidth, this.spriteHeight,
+                this.x, this.y,
+                this.width, this.height
+            );
+            
+            // Draw health bar   -    temp for checking hits
+            const healthBarHeight = 5;
+            const healthPercentage = this.health / this.maxHealth;
+            ctx.fillStyle = 'red';
+            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width, healthBarHeight);
+            ctx.fillStyle = 'green';
+            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
-
+    
         hit() {
             this.health--;
-            this.currentHeight = Math.max(minHeight, this.currentHeight - (this.maxHeight - minHeight) / 3);
-            this.y = canvas.height - this.currentHeight;
+            if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
         }
-
+    
         isDestroyed() {
             return this.health <= 0;
         }
     }
-
+    
     function createBuildings() {
-        buildings.length = 0; 
+        buildings.length = 0;
         let x = canvasEndGap;
-
-        while (x < canvasWidth - canvasEndGap) {
+        const buildingWidth = 40;
+        const buildingGap = 1;
+        
+        while (x + buildingWidth <= canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1; 
-
-        while (x < canvas.width - canvasEndGap) {
-            const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
-
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
     }
 
-
-    createBuildings(); 
-
-
     // Simulate a hit on collision
-
     function simulateCollision(building) {
-        building.hit();
-        if (building.isDestroyed()) {
-            const index = buildings.indexOf(building);
-            if (index > -1) {
-                buildings.splice(index, 1);
+        if (building.health > 0) {
+            building.hit(); // Decrease health
+            if (building.isDestroyed()) { // Remove only if health is zero
+                const index = buildings.indexOf(building);
+                if (index > -1) {
+                    buildings.splice(index, 1);
+                }
             }
         }
     }
@@ -149,20 +150,29 @@ document.addEventListener('DOMContentLoaded', function() {
         buildings.forEach(building => building.draw());
     }
 
-    function handleCollisions() {
-        buildings.forEach(building => {
-            if (
-                player.x + player.width / 2 > building.x &&
-                player.x - player.width / 2 < building.x + building.width &&
-                player.y + player.height / 2 > building.y &&
-                player.y - player.height / 2 < building.y + building.currentHeight
-            ) {
+    let lastHitBuilding = null;
+
+function handleCollisions() {
+    let collision = false;
+    buildings.forEach(building => {
+        if (
+            player.x + player.width / 2 > building.x &&
+            player.x - player.width / 2 < building.x + building.width &&
+            player.y + player.height / 2 > building.y &&
+            player.y - player.height / 2 < building.y + building.height
+        ) {
+            if (building !== lastHitBuilding) {
                 simulateCollision(building);
                 score++;
+                lastHitBuilding = building;
+                collision = true;
             }
-        });
+        }
+    });
+    if (!collision) {
+        lastHitBuilding = null;
     }
-
+}
 
     // Draw the difficulty selection screen
     function drawDifficultySelection() {
@@ -197,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
         player.reset();
         createBuildings();
     }
-
 
     // Animation loop
     let colorIndex = 0;
@@ -243,15 +252,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize the game after sprites are loaded
-    function preloadSprites(callback) {
-        playerSprite = new Image();
-        playerSprite.onload = () => {
+    let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
+
+// preloadSprites function
+function preloadSprites(callback) {
+    let loadedCount = 0;
+    const totalSprites = 4;
+
+    function onLoad() {
+        loadedCount++;
+        if (loadedCount === totalSprites) {
             player = new Player();
             createBuildings();
             callback();
-        };
-        playerSprite.src = 'assets/media/ufo.png';
+        }
     }
+
+    playerSprite = new Image();
+    playerSprite.onload = onLoad;
+    playerSprite.src = 'assets/media/ufo.png';
+
+    tallBuildingSprite = new Image();
+    tallBuildingSprite.onload = onLoad;
+    tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
+
+    medBuildingSprite = new Image();
+    medBuildingSprite.onload = onLoad;
+    medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
+
+    smallBuildingSprite = new Image();
+    smallBuildingSprite.onload = onLoad;
+    smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
+}
 
     preloadSprites(() => {
         animate();
