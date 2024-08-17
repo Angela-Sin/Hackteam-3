@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
 
+
     // Difficulty settings
     const difficultySettings = {
         easy: 5,
@@ -20,58 +21,67 @@ document.addEventListener('DOMContentLoaded', function() {
         hard: 15,
     };
 
+    let player;
+    let playerSprite;
+
+
     // Player class
     class Player {
         constructor() {
             this.reset();
         }
-
+    
         reset() {
+
             this.radius = 25;
             this.x = this.radius;
             this.y = this.radius;
             this.speed = difficultySettings[selectedDifficulty];
+
+            this.width = 70;
+            this.height = 70;
+            this.x = this.width / 2;
+            this.y = this.height / 2;
+            this.speed = 5;                     // speed controller
+
             this.direction = 1;
-            this.verticalStep = this.radius;
+            this.verticalStep = this.height / 2;
             this.gameOver = false;
         }
-
+    
         draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'yellow';
-            ctx.fill();
-            ctx.closePath();
+            ctx.drawImage(playerSprite, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-
+    
         update() {
+
             if (this.gameOver || !gameStarted) return;
 
-            this.x += this.speed * this.direction;
 
+            if (this.gameOver) return;
+    
+
+            this.x += this.speed * this.direction;
+    
             // Change direction and move down when reaching canvas boundaries
-            if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+            if (this.x + this.width / 2 > canvas.width || this.x - this.width / 2 < 0) {
                 this.direction *= -1; // Reverse direction
                 this.y += this.verticalStep; // Move down
-
-                // Stop the game if any part of the circle touches the bottom
-                if (this.y + this.radius >= canvas.height) {
+    
+                // Stop the game if any part of the sprite touches the bottom
+                if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
-                    this.y = canvas.height - this.radius;
+                    this.y = canvas.height - this.height / 2;
                 }
             }
         }
     }
 
-    const player = new Player();
-
-    // Building class
     const minHeight = 20;
     const buildingWidth = 20;
     const maxBuildingHeight = 150;
     const buildingGap = 3;
     const canvasEndGap = 10;
-    const canvasWidth = canvas.width;
     const buildings = [];
 
     class Building {
@@ -104,18 +114,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to create buildings
     function createBuildings() {
         buildings.length = 0; 
         let x = canvasEndGap;
+
         while (x < canvasWidth - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1; 
+
+        while (x < canvas.width - canvasEndGap) {
+            const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
+
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
     }
 
+
     createBuildings(); 
+
+
+    // Simulate a hit on collision
 
     function simulateCollision(building) {
         building.hit();
@@ -127,25 +145,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Draw all buildings
     function drawBuildings() {
         buildings.forEach(building => building.draw());
     }
 
-    // Handle collisions between the player and buildings
     function handleCollisions() {
         buildings.forEach(building => {
             if (
-                player.x + player.radius > building.x &&
-                player.x - player.radius < building.x + building.width &&
-                player.y + player.radius > building.y &&
-                player.y - player.radius < building.y + building.currentHeight
+                player.x + player.width / 2 > building.x &&
+                player.x - player.width / 2 < building.x + building.width &&
+                player.y + player.height / 2 > building.y &&
+                player.y - player.height / 2 < building.y + building.currentHeight
             ) {
                 simulateCollision(building);
                 score++;
             }
         });
     }
+
 
     // Draw the difficulty selection screen
     function drawDifficultySelection() {
@@ -180,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         player.reset();
         createBuildings();
     }
+
 
     // Animation loop
     let colorIndex = 0;
@@ -224,5 +242,18 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(animate);
     }
 
-    animate();
+    // Initialize the game after sprites are loaded
+    function preloadSprites(callback) {
+        playerSprite = new Image();
+        playerSprite.onload = () => {
+            player = new Player();
+            createBuildings();
+            callback();
+        };
+        playerSprite.src = 'assets/media/ufo.png';
+    }
+
+    preloadSprites(() => {
+        animate();
+    });
 });
