@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
 
+
     // Difficulty settings
     const difficultySettings = {
         easy: 2,
@@ -46,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         update() {
             if (this.gameOver || !gameStarted) return;
-
             this.x += this.speed * this.direction;
 
             // Change direction and move down when reaching canvas boundaries
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buildingGap = 3;
     const canvasEndGap = 10;
     const buildings = [];
-
+  
     class Building {
         constructor(x, width, health) {
             this.x = x;
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.width, this.height
             );
             
-            // Draw health bar
+            // Draw health bar   -    temp for checking hits
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
             ctx.fillStyle = 'red';
@@ -127,12 +127,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const buildingGap = 1;
         
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
-            const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
+            const health = Math.floor(Math.random() * 3) + 1; 
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
     }
 
+    // Simulate a hit on collision
     function simulateCollision(building) {
         if (building.health > 0) {
             building.hit(); // Decrease health
