@@ -14,6 +14,20 @@ We are a passionate team of developers and designers participating in the Code I
 
 In this hackathon, our goal is to [Briefly describe your project, e.g., "bring classic arcade games into the modern era" or "design a brand-new retro-inspired game with innovative features"]. We believe our project will capture the nostalgia of retro gaming while introducing exciting new elements.
 
+At first, Commodore tried to promote the new home computer (our favorite C64) by releasing a few simple games. Most of them was with boring design, but they all had a certain "charm". Super Blitz was one such game released by Commodore back in 1983, and it was no exception.
+
+![Author](/assets/images/blitz.jpg.png)
+
+In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'll have to use your bombs to clear the city below so you can land safely (how politically incorrect is that?!). Although the plane is very old, it is equipped with additional smart bombs that can "sense" their siblings, meaning that you cannot drop a bomb before the previous one hits the ground. You gradually lose height, and if you don't clear all the buildings in time, you're dead. Sometimes a cloud will block your view and make it difficult to decide when to drop the bomb. Coincidentally, King Kong is also patrolling the city below, so if you can hit the building as it goes up it, you'll get a bonus. If you land your plane safely, you'll advance to the next level, which is exactly the same story except with a different (random) city layout.
+
+![Game](/assets/images/blitz1.jpg.png)
+
+**By following this links you can learn more about origin game!**
+
+- **Supper blitz** - [View](https://www.lemon64.com/game/super-blitz)
+- **Game in action** - [View](https://www.youtube.com/watch?v=ccYSdrgWwGg)
+- **Wikipedia** - [View](<https://en.wikipedia.org/wiki/Blitz_(video_game)>)
+
 ## Our Contributions
 
 - **Team Role**: [Describe the team's role, e.g., "Game Development," "UI/UX Design," "Backend Engineering"]
@@ -129,6 +143,7 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 | [Coolors](https://coolors.co/)                         | Across website | Colour palette selection                            |
 | [W3Schools](https://www.w3schools.com/)                | Across website | Various help pages                                  |
 | [Pastebin](https://pastebin.com/gEfdRwgc)              | Across website | Background Star Flash                               |
+| [Wikipedia](https://en.wikipedia.org/)                 | Across website | History of origi game                               |
 
 ### Acknowledgements
 
