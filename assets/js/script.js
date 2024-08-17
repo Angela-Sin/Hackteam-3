@@ -8,58 +8,54 @@ document.addEventListener('DOMContentLoaded', function() {
     let score = 0;
     ctx.font = '50px Pixelify Sans';
 
+    let player;
+    let playerSprite;
+
     // Player class
     class Player {
         constructor() {
             this.reset();
         }
-
+    
         reset() {
-            this.radius = 25;
-            this.x = this.radius;
-            this.y = this.radius;
-            this.speed = 10;                                                     // currently 10 for testing only
+            this.width = 70;
+            this.height = 70;
+            this.x = this.width / 2;
+            this.y = this.height / 2;
+            this.speed = 5;                     // speed controller
             this.direction = 1;
-            this.verticalStep = this.radius;
+            this.verticalStep = this.height / 2;
             this.gameOver = false;
         }
-
+    
         draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'yellow';
-            ctx.fill();
-            ctx.closePath();
+            ctx.drawImage(playerSprite, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-
+    
         update() {
             if (this.gameOver) return;
-
+    
             this.x += this.speed * this.direction;
-
+    
             // Change direction and move down when reaching canvas boundaries
-            if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+            if (this.x + this.width / 2 > canvas.width || this.x - this.width / 2 < 0) {
                 this.direction *= -1; // Reverse direction
                 this.y += this.verticalStep; // Move down
-
-                // Stop the game if any part of the circle touches the bottom
-                if (this.y + this.radius >= canvas.height) {
+    
+                // Stop the game if any part of the sprite touches the bottom
+                if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
-                    this.y = canvas.height - this.radius;
+                    this.y = canvas.height - this.height / 2;
                 }
             }
         }
     }
 
-    const player = new Player();
-
-    // Building class
     const minHeight = 20;
     const buildingWidth = 20;
     const maxBuildingHeight = 150;
     const buildingGap = 3;
     const canvasEndGap = 10;
-    const canvasWidth = canvas.width;
     const buildings = [];
 
     class Building {
@@ -73,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         calculateHeight() {
-            // Height is now based on health
             return minHeight + (this.health * (maxBuildingHeight - minHeight) / 3);
         }
 
@@ -84,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         hit() {
             this.health--;
-            // Reduce the height by a third of max height
             this.currentHeight = Math.max(minHeight, this.currentHeight - (this.maxHeight - minHeight) / 3);
             this.y = canvas.height - this.currentHeight;
         }
@@ -94,18 +88,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to create buildings
     function createBuildings() {
         buildings.length = 0; // Clear any existing buildings
         let x = canvasEndGap;
-        while (x < canvasWidth - canvasEndGap) {
+        while (x < canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
     }
-
-    createBuildings(); // Initial creation of buildings
 
     // Simulate a hit on collision
     function simulateCollision(building) {
@@ -118,29 +109,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Draw all buildings
     function drawBuildings() {
         buildings.forEach(building => building.draw());
     }
 
-    // Handle collisions between the player and buildings
     function handleCollisions() {
         buildings.forEach(building => {
             if (
-                player.x + player.radius > building.x &&
-                player.x - player.radius < building.x + building.width &&
-                player.y + player.radius > building.y &&
-                player.y - player.radius < building.y + building.currentHeight
+                player.x + player.width / 2 > building.x &&
+                player.x - player.width / 2 < building.x + building.width &&
+                player.y + player.height / 2 > building.y &&
+                player.y - player.height / 2 < building.y + building.currentHeight
             ) {
                 simulateCollision(building);
                 score++;
             }
         });
     }
-
-    // projectiles
-
-    
 
     // Animation loop
     let colorIndex = 0;
@@ -183,5 +168,18 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(animate);
     }
 
-    animate();
+    // Initialize the game after sprites are loaded
+    function preloadSprites(callback) {
+        playerSprite = new Image();
+        playerSprite.onload = () => {
+            player = new Player();
+            createBuildings();
+            callback();
+        };
+        playerSprite.src = 'assets/media/ufo.png';
+    }
+
+    preloadSprites(() => {
+        animate();
+    });
 });
