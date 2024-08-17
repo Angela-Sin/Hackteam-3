@@ -5,11 +5,25 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.width = 800;
     canvas.height = 500;
 
+    // Game State Variables
     let score = 0;
+    let gameStarted = false;
+    let selectedDifficulty = 'normal'; // Default difficulty
+
+    // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
+
+
+    // Difficulty settings
+    const difficultySettings = {
+        easy: 5,
+        normal: 10,
+        hard: 15,
+    };
 
     let player;
     let playerSprite;
+
 
     // Player class
     class Player {
@@ -18,11 +32,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         reset() {
+
+            this.radius = 25;
+            this.x = this.radius;
+            this.y = this.radius;
+            this.speed = difficultySettings[selectedDifficulty];
+
             this.width = 70;
             this.height = 70;
             this.x = this.width / 2;
             this.y = this.height / 2;
             this.speed = 5;                     // speed controller
+
             this.direction = 1;
             this.verticalStep = this.height / 2;
             this.gameOver = false;
@@ -33,8 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         update() {
+
+            if (this.gameOver || !gameStarted) return;
+
+
             if (this.gameOver) return;
     
+
             this.x += this.speed * this.direction;
     
             // Change direction and move down when reaching canvas boundaries
@@ -89,16 +115,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createBuildings() {
-        buildings.length = 0; // Clear any existing buildings
+        buildings.length = 0; 
         let x = canvasEndGap;
+
+        while (x < canvasWidth - canvasEndGap) {
+            const health = Math.floor(Math.random() * 3) + 1; 
+
         while (x < canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
+
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
     }
 
+
+    createBuildings(); 
+
+
     // Simulate a hit on collision
+
     function simulateCollision(building) {
         building.hit();
         if (building.isDestroyed()) {
@@ -127,6 +163,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+
+    // Draw the difficulty selection screen
+    function drawDifficultySelection() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'yellow';
+        ctx.font = '30px Pixelify Sans';
+        ctx.fillText('Select Difficulty', canvas.width / 2 - 150, canvas.height / 2 - 150);
+        ctx.fillText('1: Easy', canvas.width / 2 - 50, canvas.height / 2 - 50);
+        ctx.fillText('2: Normal', canvas.width / 2 - 50, canvas.height / 2);
+        ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
+    }
+
+    // Event listener for difficulty selection
+    document.addEventListener('keydown', function(event) {
+        if (!gameStarted) {
+            if (event.key === '1') {
+                selectedDifficulty = 'easy';
+                startGame();
+            } else if (event.key === '2') {
+                selectedDifficulty = 'normal';
+                startGame();
+            } else if (event.key === '3') {
+                selectedDifficulty = 'hard';
+                startGame();
+            }
+        }
+    });
+
+    // Start the game
+    function startGame() {
+        gameStarted = true;
+        player.reset();
+        createBuildings();
+    }
+
+
     // Animation loop
     let colorIndex = 0;
     const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
@@ -140,31 +212,33 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentColor = colors[colorIndex];
 
     function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawBuildings();
-        player.update();
-        player.draw();
-        handleCollisions();
+        if (!gameStarted) {
+            drawDifficultySelection();
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBuildings();
+            player.update();
+            player.draw();
+            handleCollisions();
 
-        if (player.gameOver) {
-            frameCount++;
-            if (frameCount % 15 === 0) {
-                currentColor = getNextColor();
-            }
-            ctx.fillStyle = currentColor;
-            ctx.font = '60px Pixelify Sans';
-            ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
+            if (player.gameOver) {
+                frameCount++;
+                if (frameCount % 15 === 0) {
+                    currentColor = getNextColor();
+                }
+                ctx.fillStyle = currentColor;
+                ctx.font = '60px Pixelify Sans';
+                ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
 
-            if (frameCount > 1000) { // Reset after some delay
-                player.reset();
-                frameCount = 0;
-                colorIndex = 0;
-                currentColor = colors[colorIndex];
-                score = 0;
-                createBuildings(); // Recreate buildings
+                if (frameCount > 1000) {
+                    gameStarted = false;
+                    frameCount = 0;
+                    colorIndex = 0;
+                    currentColor = colors[colorIndex];
+                    score = 0;
+                }
             }
         }
-
         requestAnimationFrame(animate);
     }
 
