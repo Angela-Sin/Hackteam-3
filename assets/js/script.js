@@ -56,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Building class
     const minHeight = 20;
     const buildingWidth = 20;
-    const maxBuildingHeight = 300;
+    const maxBuildingHeight = 150;
+    const buildingGap = 3;
+    const canvasEndGap = 10;
     const canvasWidth = canvas.width;
     const buildings = [];
 
@@ -95,9 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to create buildings
     function createBuildings() {
         buildings.length = 0; // Clear any existing buildings
-        for (let x = 0; x < canvasWidth; x += buildingWidth) {
+        let x = canvasEndGap;
+        while (x < canvasWidth - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1; // Random health between 1 and 3
             buildings.push(new Building(x, buildingWidth, health));
+            x += buildingWidth + buildingGap;
         }
     }
 
