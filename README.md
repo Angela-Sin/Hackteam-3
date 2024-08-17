@@ -136,12 +136,12 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 
   - [Kiree Bellamy](https://github.com/swewi)
 
-  - [Kim](https://github.com/kimatron)
+  - [Kim Hanlon](https://github.com/kimatron)
 
   - [Angela Siniavskaja](https://github.com/Angela-Sin)
 
   - [Ahmad Al Hindi](https://github.com/Ahmadalhindi)
 
-  - [Ahmad Al Hindi](https://github.com/Ahmadalhindi)
+  - [Amir Ahmed](https://github.com/AmirAkmed)
 
-  - [Ahmad Al Hindi](https://github.com/Ahmadalhindi)
+  - [Catherine Parrish](https://github.com/CatherineP37)
