@@ -117,9 +117,8 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 ## Features
 
-- Responsive on all device sizes
-
 - Interactive elements
+- Challenge
 
 ## Technologies Used
 
@@ -141,13 +140,12 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 ### Further Testing
 
 - The Website was tested on Google Chrome, Internet Explorer, Microsoft Edge and Safari browsers.
-- The website was viewed on a variety of devices such as Desktop, Laptop, iPhone7, iPhone 8 & iPhoneX.
-- A large amount of testing was done to ensure that all pages were linking correctly.
 - Friends and family members were asked to review the site and documentation to point out any bugs and/or user experience issues.
 
 ### Future addings
 
 - The game should handle different sprite sizes and ensure they fit within its visual design.
+- Reorganise JavaScript into modules for modernisation and readability please
 
 ## Getting Started
 
@@ -199,27 +197,24 @@ By forking the GitHub Repository we make a copy of the original repository on ou
 
 Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#cloning-a-repository-to-github-desktop) to retrieve pictures for some of the buttons and more detailed explanations of the above process.
 
-## Credits
-
-### Code
-
 ### Content
 
 - All content was written by the Retro Gaming Hackathon Team.
 
 ## Resources Used
 
-| Source                                                                                                       | Location       | Notes                        |
-| ------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------- |
-| [YouTube](https://www.youtube.com/)                                                                          | Acros website  | Tutorial for troubleshouting |
-| [Font Awesome](https://fontawesome.com/)                                                                     | Across website | Inspiration for icons        |
-| [Fonts Google](https://fonts.google.com/)                                                                    | Across website | Font selection               |
-| [Coolors](https://coolors.co/)                                                                               | Across website | Colour palette selection     |
-| [W3Schools](https://www.w3schools.com/)                                                                      | Across website | Various help pages           |
-| [Pastebin](https://pastebin.com/gEfdRwgc)                                                                    | Across website | Background Star Flash        |
-| [Wikipedia](https://en.wikipedia.org/)                                                                       | Across website | History of origin game       |
-| [Pixilart](https://www.pixilart.com/draw)                                                                    | Across website | Chareacters creation         |
-| [Balsamiq](https://balsamiq.com/?gad_source=1&gclid=EAIaIQobChMI9-DR99b-hwMV9JtQBh0I3yMEEAAYASAAEgJTpPD_BwE) | Across website | Wireframes creation          |
+| Source                                                                                                               | Location       | Notes                        |
+| -------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------- |
+| [YouTube](https://www.youtube.com/)                                                                                  | Acros website  | Tutorial for troubleshouting |
+| [Font Awesome](https://fontawesome.com/)                                                                             | Across website | Inspiration for icons        |
+| [Fonts Google](https://fonts.google.com/)                                                                            | Across website | Font selection               |
+| [Coolors](https://coolors.co/)                                                                                       | Across website | Colour palette selection     |
+| [W3Schools](https://www.w3schools.com/)                                                                              | Across website | Various help pages           |
+| [Pastebin](https://pastebin.com/gEfdRwgc)                                                                            | Across website | Background Star Flash        |
+| [Wikipedia](https://en.wikipedia.org/)                                                                               | Across website | History of origin game       |
+| [Pixilart](https://www.pixilart.com/draw)                                                                            | Across website | Chareacters creation         |
+| [Balsamiq](https://balsamiq.com/?gad_source=1&gclid=EAIaIQobChMI9-DR99b-hwMV9JtQBh0I3yMEEAAYASAAEgJTpPD_BwE)         | Across website | Wireframes creation          |
+| [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=69233) | Across website | Sounds liabrary              |
 
 ### Acknowledgements
 
