@@ -1,4 +1,22 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    // Load sound effects
+    const sounds = {
+        bombDrop: new Audio('assets/media/sounds/bombDrop.mp3'),
+        bombHit: new Audio('assets/media/sounds/bombHit.mp3'),
+        bombMiss: new Audio('assets/media/sounds/bombMiss.mp3'),
+        levelChange: new Audio('assets/media/sounds/levelChange.mp3'),
+        gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
+        gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
+        gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
+        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
+    };
+
+    // Ensure volume is set (default is 1.0)
+    Object.values(sounds).forEach(sound => sound.volume = 1.0);
+
+    // Play background music in a loop
+    sounds.backgroundMusic.loop = true;
+
     // Canvas setup
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -107,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buildingGap = 3;
     const canvasEndGap = 10;
     const buildings = [];
- 
+
     class Building {
         constructor(x, width, health) {
             this.x = x;
@@ -121,13 +139,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
         }
-   
+
         selectSprite() {
             if (this.health === 3) return tallBuildingSprite;
             if (this.health === 2) return medBuildingSprite;
             return smallBuildingSprite;
         }
-   
+
         draw() {
             const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
             ctx.drawImage(
@@ -137,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x, this.y,
                 this.width, this.height
             );
-           
+
             // Draw health bar   -    temp for checking hits
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
@@ -146,23 +164,23 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = 'green';
             ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
-   
+
         hit() {
             this.health--;
             if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
         }
-   
+
         isDestroyed() {
             return this.health <= 0;
         }
     }
-   
+
     function createBuildings() {
         buildings.length = 0;
         let x = canvasEndGap;
         const buildingWidth = 40;
         const buildingGap = 1;
-       
+
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1;
             buildings.push(new Building(x, buildingWidth, health));
@@ -208,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     simulateCollision(building);
                     score++;
                     projectile.active = false; // Deactivate projectile
+                    sounds.bombHit.play(); // Play bomb hit sound
                 }
             });
         });
@@ -249,41 +268,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listener for difficulty selection
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
-            if (event.key === '1') {
-                selectedDifficulty = 'easy';
-                startGame();
-            } else if (event.key === '2') {
-                selectedDifficulty = 'normal';
-                startGame();
-            } else if (event.key === '3') {
-                selectedDifficulty = 'hard';
-                startGame();
+            if (event.key === '1' || event.key === '2' || event.key === '3') {
+                selectedDifficulty = event.key === '1' ? 'easy' : event.key === '2' ? 'normal' : 'hard';
+                sounds.levelChange.play();
+                startGame(); // Start game after difficulty is selected
             }
-        } else if (event.key === ' ' && canDropBomb) { // Space key to drop projectile
-            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-            canDropBomb = false;
+        } else if (event.key === ' ' && canDropBomb) {
+            dropBomb(); // Drop bomb with sound
         }
     });
 
-    // Event listeners for mouse input
-    canvas.addEventListener('mousedown', function(event) {
-        if (gameStarted && canDropBomb) {
-            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-            canDropBomb = false;
+    // Similar mouse interaction to start sounds
+    canvas.addEventListener('mousedown', function (event) {
+        if (!gameStarted) {
+            startGame(); // Start game on click, allow sounds
+        } else if (canDropBomb) {
+            dropBomb(); // Drop bomb with sound
         }
     });
 
-    // Allow dropping another bomb when the previous one lands
-    function checkIfCanDropBomb() {
-        if (projectiles.every(p => !p.active)) {
-            canDropBomb = true;
+    function drawScore() {
+        ctx.fillStyle = 'yellow';
+        ctx.fillText('Score: ' + score, 20, 50);
+    }
+
+    function dropBomb() {
+        if (canDropBomb) {
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            canDropBomb = false;
+            sounds.bombDrop.play();
         }
     }
 
-    // Start the game
     function startGame() {
+        sounds.backgroundMusic.play(); // Start music after user interaction
         gameStarted = true;
         player.reset();
         createBuildings();
@@ -291,86 +311,62 @@ document.addEventListener('DOMContentLoaded', function() {
         canDropBomb = true;
     }
 
-    // Animation loop
-    let colorIndex = 0;
-    const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
-
-    function getNextColor() {
-        colorIndex = (colorIndex + 1) % colors.length;
-        return colors[colorIndex];
+    function handleGameOver() {
+        if (player.gameOver) {
+            sounds.backgroundMusic.pause(); // Stop background music
+            sounds.gameOver.play(); // Play game over sound
+        }
     }
 
-    let frameCount = 0;
-    let currentColor = colors[colorIndex];
-
     function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         if (!gameStarted) {
             drawDifficultySelection();
         } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBuildings();
-            drawProjectiles();
             player.update();
-            player.draw();
             updateProjectiles();
             handleProjectileCollisions();
-            handleCollisions();
-            checkIfCanDropBomb();
-
-            if (player.gameOver) {
-                frameCount++;
-                if (frameCount % 15 === 0) {
-                    currentColor = getNextColor();
-                }
-                ctx.fillStyle = currentColor;
-                ctx.font = '60px Pixelify Sans';
-                ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
-
-                if (frameCount > 1000) {
-                    gameStarted = false;
-                    frameCount = 0;
-                    colorIndex = 0;
-                    currentColor = colors[colorIndex];
-                    score = 0;
-                }
-            }
+            drawBuildings();
+            drawProjectiles();
+            drawScore();
+            player.draw();
+            handleGameOver();
         }
+
         requestAnimationFrame(animate);
     }
 
-    // Initialize the game after sprites are loaded
-    let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
-
-    // preloadSprites function
     function preloadSprites(callback) {
-        let loadedCount = 0;
-        const totalSprites = 4;
+        const spriteSheet1 = new Image();
+        const spriteSheet2 = new Image();
+        const spriteSheet3 = new Image();
+        const playerImg = new Image();
 
-        function onLoad() {
-            loadedCount++;
-            if (loadedCount === totalSprites) {
-                player = new Player();
-                createBuildings();
-                callback();
-            }
-        }
+        let loadedSprites = 0;
+        const spriteLoaded = () => {
+            loadedSprites++;
+            if (loadedSprites === 4) callback();
+        };
 
-        playerSprite = new Image();
-        playerSprite.onload = onLoad;
-        playerSprite.src = 'assets/media/ufo.png';
+        spriteSheet1.src = 'assets/images/buildings/spritesheet1.png';
+        spriteSheet2.src = 'assets/images/buildings/spritesheet2.png';
+        spriteSheet3.src = 'assets/images/buildings/spritesheet3.png';
+        playerImg.src = 'assets/images/playerSprite.png';
 
-        tallBuildingSprite = new Image();
-        tallBuildingSprite.onload = onLoad;
-        tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
+        spriteSheet1.onload = spriteLoaded;
+        spriteSheet2.onload = spriteLoaded;
+        spriteSheet3.onload = spriteLoaded;
+        playerImg.onload = spriteLoaded;
 
-        medBuildingSprite = new Image();
-        medBuildingSprite.onload = onLoad;
-        medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
-
-        smallBuildingSprite = new Image();
-        smallBuildingSprite.onload = onLoad;
-        smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
+        smallBuildingSprite = spriteSheet1;
+        medBuildingSprite = spriteSheet2;
+        tallBuildingSprite = spriteSheet3;
+        playerSprite = playerImg;
     }
+
+    // Initialize the player
+    player = new Player();
 
     preloadSprites(() => {
         animate();
