@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Canvas setup
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -12,6 +12,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let canDropBomb = true;
     let difficultySelected = false; // Track if difficulty is selected
     let gameWon = false; // Track if the game is won
+    let isPaused = false; // Track if the game is paused
+
+    // Load sound effects
+    const sounds = {
+        bombDrop: new Audio('assets/media/sounds/bombDrop.mp3'),
+        bombHit: new Audio('assets/media/sounds/bombHit.mp3'),
+        bombMiss: new Audio('assets/media/sounds/bombMiss.mp3'),
+        levelChange: new Audio('assets/media/sounds/levelChange.mp3'),
+        gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
+        gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
+        gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
+        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
+    };
+
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
@@ -51,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update player position and handle game-over conditions
         update() {
-            if (this.gameOver || !gameStarted) return;
+            if (this.gameOver || !gameStarted || isPaused) return;
             this.x += this.speed * this.direction;
 
             // Change direction and move down when reaching canvas boundaries
@@ -63,6 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
                     this.y = canvas.height - this.height / 2;
+                    sounds.gameOver.play(); // Play game over sound
+                    sounds.backgroundMusic.pause(); // Stop background music
                 }
             }
         }
@@ -79,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Draw projectile on canvas
+
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -88,14 +105,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Update projectile position and deactivate if it goes off-screen
+
         update() {
             this.y += this.speed;
             if (this.y - this.radius > canvas.height) {
                 this.active = false;
+
             }
         }
 
         // Check if the projectile collides with a building
+
+                sounds.bombMiss.play(); // Play bomb miss sound
+            }
+        }
+
         checkCollision(building) {
             const dx = this.x - (building.x + building.width / 2);
             const dy = this.y - (building.y + building.height / 2);
@@ -108,23 +132,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Array to hold projectiles
     const projectiles = [];
 
+
     // buildings
     const canvasEndGap = 10;
     const buildings = [];
 
     // Building class
+
     class Building {
-        constructor(x, width, health) {
+        constructor(x, width, health, sprite) {
             this.x = x;
             this.width = width;
             this.health = health;
             this.maxHealth = health;
-            this.sprite = this.selectSprite();
+            this.sprite = sprite;  // Pass the correct sprite when creating the building
             this.spriteWidth = 48;
             this.spriteHeight = 202;
             this.scale = this.width / this.spriteWidth;
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
+
         }
 
         // Select the sprite based on building health
@@ -132,11 +159,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.health === 3) return tallBuildingSprite;
             if (this.health === 2) return medBuildingSprite;
             return smallBuildingSprite;
+
         }
 
         // Draw building and its health bar on canvas
         draw() {
-            const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
+            let spriteX;
+            if (this.isDestroyed) {
+                spriteX = (this.maxHealth) * this.spriteWidth;
+            } else {
+                spriteX = (this.maxHealth - this.health) * this.spriteWidth;
+            }
+    
             ctx.drawImage(
                 this.sprite,
                 spriteX, 0,
@@ -144,38 +178,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x, this.y,
                 this.width, this.height
             );
-            
-            // Draw health bar for debugging
-            const healthBarHeight = 5;
-            const healthPercentage = this.health / this.maxHealth;
-            ctx.fillStyle = 'red';
-            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width, healthBarHeight);
-            ctx.fillStyle = 'green';
-            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
 
         // Decrease health on hit
         hit() {
-            this.health--;
-            if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
-        }
 
-        // Check if the building is destroyed
-        isDestroyed() {
-            return this.health <= 0;
+            if (!this.isDestroyed) {
+                this.health--;
+                if (this.health <= 0) {
+                    this.health = 0; // Ensure health doesn't go below zero
+                    this.isDestroyed = true; // Mark as destroyed
+                }
+            }
         }
     }
-
-    // Create a row of buildings on the canvas
     function createBuildings() {
         buildings.length = 0;
         let x = canvasEndGap;
         const buildingWidth = 40;
         const buildingGap = 1;
-        
+    
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
-            const health = Math.floor(Math.random() * 3) + 1; 
-            buildings.push(new Building(x, buildingWidth, health));
+            const health = Math.floor(Math.random() * 3) + 1;
+    
+            // Assign the sprite based on the health or other criteria
+            let sprite;
+            if (health === 3) {
+                sprite = tallBuildingSprite;
+            } else if (health === 2) {
+                sprite = medBuildingSprite;
+            } else {
+                sprite = smallBuildingSprite;
+            }
+    
+            buildings.push(new Building(x, buildingWidth, health, sprite));
             x += buildingWidth + buildingGap;
         }
     }
@@ -197,6 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     score += 100; // Add 100 points if no buildings are left
                     gameWon = true; // Set gameWon to true when all buildings are destroyed
                 }
+
+                sounds.bombHit.play(); // Play bomb hit sound
+
             }
         }
     }
@@ -206,12 +245,12 @@ document.addEventListener('DOMContentLoaded', function() {
         buildings.forEach(building => building.draw());
     }
 
-    // Draw all projectiles on canvas
+
     function drawProjectiles() {
         projectiles.forEach(projectile => projectile.draw());
     }
 
-    // Update position of all projectiles and remove inactive ones
+
     function updateProjectiles() {
         projectiles.forEach(projectile => {
             projectile.update();
@@ -220,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (index > -1) projectiles.splice(index, 1);
             }
         });
+
     }
 
     // Handle collisions between projectiles and buildings
@@ -254,6 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreBoard.textContent = 'Score: ' + score;
     }    
 
+
     // Draw the difficulty selection screen
     function drawDifficultySelection() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -264,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillText('2: Normal', canvas.width / 2 - 50, canvas.height / 2);
         ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
     }
+
 
     // Event listener for difficulty selection and projectile dropping
     document.addEventListener('keydown', function(event) {
@@ -279,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (event.key === '3') {
                 selectedDifficulty = 'hard';
                 difficultySelected = true; // Mark difficulty as selected
+
                 startGame();
             }
         } else if (event.key === ' ' && gameStarted && canDropBomb) { // Space key to drop projectile
@@ -291,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.addEventListener('mousedown', function(event) {
         if (gameStarted && canDropBomb) {
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+
             canDropBomb = false;
         }
     });
@@ -303,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize game state and start the game
+
     function startGame() {
         gameStarted = true;
         gameWon = false; // Reset gameWon
@@ -312,7 +357,49 @@ document.addEventListener('DOMContentLoaded', function() {
         canDropBomb = true;
     }
 
-    // Animation loop with color changes for win/loss messages
+
+        isPaused = false; // Ensure the game is not paused when starting
+        sounds.backgroundMusic.loop = true; // Loop background music
+        sounds.backgroundMusic.play(); // Start background music
+    }
+
+    // Function to toggle pause state and show/hide modal
+    function togglePause() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            showPauseMenu();
+        } else {
+            hidePauseMenu();
+        }
+    }
+
+    // Show and hide the modal
+    function showPauseMenu() {
+        document.getElementById('pauseModal').style.display = 'block';
+    }
+
+    function hidePauseMenu() {
+        document.getElementById('pauseModal').style.display = 'none';
+    }
+
+    // Resume the game
+    document.getElementById('resumeButton').addEventListener('click', function() {
+        togglePause();
+    });
+
+    // Quit the game
+    document.getElementById('quitButton').addEventListener('click', function() {
+        window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
+    });
+
+    // Listen for the Escape key to toggle pause
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && gameStarted) {
+            togglePause();
+        }
+    });
+
+    // Animation loop
     let colorIndex = 0;
     const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
 
@@ -327,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function animate() {
         if (!gameStarted) {
             drawDifficultySelection();
-        } else {
+        } else if (!isPaused) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBuildings();
             drawProjectiles();
@@ -337,8 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             handleProjectileCollisions();
             handleCollisions();
             checkIfCanDropBomb();
-    
-            drawScore(); // Draw the score during the game
+
 
             if (gameWon) {
                 frameCount++;
@@ -382,7 +468,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the game after sprites are loaded
     let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
 
+
     // Preload sprites and initialize game objects
+
     function preloadSprites(callback) {
         let loadedCount = 0;
         const totalSprites = 4;
