@@ -110,27 +110,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const buildings = [];
 
     class Building {
-        constructor(x, width, health) {
+        constructor(x, width, health, sprite) {
             this.x = x;
             this.width = width;
             this.health = health;
             this.maxHealth = health;
-            this.sprite = this.selectSprite();
+            this.sprite = sprite;  // Pass the correct sprite when creating the building
             this.spriteWidth = 48;
             this.spriteHeight = 202;
             this.scale = this.width / this.spriteWidth;
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
+            this.isDestroyed = false; // Flag to track if the building is destroyed
         }
-
-        selectSprite() {
-            if (this.health === 3) return tallBuildingSprite;
-            if (this.health === 2) return medBuildingSprite;
-            return smallBuildingSprite;
-        }
-
+    
         draw() {
-            const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
+            let spriteX;
+            if (this.isDestroyed) {
+                spriteX = (this.maxHealth) * this.spriteWidth;
+            } else {
+                spriteX = (this.maxHealth - this.health) * this.spriteWidth;
+            }
+    
             ctx.drawImage(
                 this.sprite,
                 spriteX, 0,
@@ -138,35 +139,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x, this.y,
                 this.width, this.height
             );
-
-            // Draw health bar - temporary for checking hits
-            const healthBarHeight = 5;
-            const healthPercentage = this.health / this.maxHealth;
-            ctx.fillStyle = 'red';
-            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width, healthBarHeight);
-            ctx.fillStyle = 'green';
-            ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
-
+    
         hit() {
-            this.health--;
-            if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
-        }
-
-        isDestroyed() {
-            return this.health <= 0;
+            if (!this.isDestroyed) {
+                this.health--;
+                if (this.health <= 0) {
+                    this.health = 0; // Ensure health doesn't go below zero
+                    this.isDestroyed = true; // Mark as destroyed
+                }
+            }
         }
     }
-
     function createBuildings() {
         buildings.length = 0;
         let x = canvasEndGap;
         const buildingWidth = 40;
         const buildingGap = 1;
-
+    
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1;
-            buildings.push(new Building(x, buildingWidth, health));
+    
+            // Assign the sprite based on the health or other criteria
+            let sprite;
+            if (health === 3) {
+                sprite = tallBuildingSprite;
+            } else if (health === 2) {
+                sprite = medBuildingSprite;
+            } else {
+                sprite = smallBuildingSprite;
+            }
+    
+            buildings.push(new Building(x, buildingWidth, health, sprite));
             x += buildingWidth + buildingGap;
         }
     }
