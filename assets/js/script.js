@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Canvas setup
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedDifficulty = 'normal'; // Default difficulty
     let canDropBomb = true;
     let isPaused = false; // Track if the game is paused
+
+    // Load sound effects
+    const sounds = {
+        bombDrop: new Audio('assets/media/sounds/bombDrop.mp3'),
+        bombHit: new Audio('assets/media/sounds/bombHit.mp3'),
+        bombMiss: new Audio('assets/media/sounds/bombMiss.mp3'),
+        levelChange: new Audio('assets/media/sounds/levelChange.mp3'),
+        gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
+        gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
+        gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
+        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
+    };
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
@@ -59,6 +71,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
                     this.y = canvas.height - this.height / 2;
+                    sounds.gameOver.play(); // Play game over sound
+                    sounds.backgroundMusic.pause(); // Stop background music
                 }
             }
         }
@@ -86,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.y += this.speed;
             if (this.y - this.radius > canvas.height) {
                 this.active = false;
+                sounds.bombMiss.play(); // Play bomb miss sound
             }
         }
 
@@ -180,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (index > -1) {
                     buildings.splice(index, 1);
                 }
+                sounds.bombHit.play(); // Play bomb hit sound
             }
         }
     }
@@ -213,8 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    let lastHitBuilding = null;
 
     function handleCollisions() {
         let collision = false;
@@ -250,28 +264,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listener for difficulty selection
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
             if (event.key === '1') {
                 selectedDifficulty = 'easy';
+                sounds.levelChange.play(); // Play level change sound
                 startGame();
             } else if (event.key === '2') {
                 selectedDifficulty = 'normal';
+                sounds.levelChange.play(); // Play level change sound
                 startGame();
             } else if (event.key === '3') {
                 selectedDifficulty = 'hard';
+                sounds.levelChange.play(); // Play level change sound
                 startGame();
             }
-        } else if (event.key === ' ' && canDropBomb) { // Space key to drop projectile
-            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-            canDropBomb = false;
         }
     });
 
     // Event listeners for mouse input
-    canvas.addEventListener('mousedown', function(event) {
+    canvas.addEventListener('mousedown', function (event) {
         if (gameStarted && canDropBomb) {
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            sounds.bombDrop.play(); // Play bomb drop sound
             canDropBomb = false;
         }
     });
@@ -291,6 +306,8 @@ document.addEventListener('DOMContentLoaded', function() {
         projectiles.length = 0;
         canDropBomb = true;
         isPaused = false; // Ensure the game is not paused when starting
+        sounds.backgroundMusic.loop = true; // Loop background music
+        sounds.backgroundMusic.play(); // Start background music
     }
 
     // Function to toggle pause state and show/hide modal
@@ -313,17 +330,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Resume the game
-    document.getElementById('resumeButton').addEventListener('click', function() {
+    document.getElementById('resumeButton').addEventListener('click', function () {
         togglePause();
     });
 
     // Quit the game
-    document.getElementById('quitButton').addEventListener('click', function() {
+    document.getElementById('quitButton').addEventListener('click', function () {
         window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
     });
 
     // Listen for the Escape key to toggle pause
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && gameStarted) {
             togglePause();
         }
@@ -416,40 +433,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // js for modal
-
 const openModalButtons = document.querySelectorAll('[data-modal-target]')
 const closeModalButtons = document.querySelectorAll('[data-close-button]')
 const overlay = document.getElementById('overlay')
 
 openModalButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const modal = document.querySelector(button.dataset.modalTarget)
-    openModal(modal)
-  })
+    button.addEventListener('click', () => {
+        const modal = document.querySelector(button.dataset.modalTarget)
+        openModal(modal)
+    })
 })
 
 overlay.addEventListener('click', () => {
-  const modals = document.querySelectorAll('.modal.active')
-  modals.forEach(modal => {
-    closeModal(modal)
-  })
+    const modals = document.querySelectorAll('.modal.active')
+    modals.forEach(modal => {
+        closeModal(modal)
+    })
 })
 
 closeModalButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const modal = button.closest('.modal')
-    closeModal(modal)
-  })
+    button.addEventListener('click', () => {
+        const modal = button.closest('.modal')
+        closeModal(modal)
+    })
 })
 
 function openModal(modal) {
-  if (modal == null) return
-  modal.classList.add('active')
-  overlay.classList.add('active')
+    if (modal == null) return
+    modal.classList.add('active')
+    overlay.classList.add('active')
 }
 
 function closeModal(modal) {
-  if (modal == null) return
-  modal.classList.remove('active')
-  overlay.classList.remove('active')
+    if (modal == null) return
+    modal.classList.remove('active')
+    overlay.classList.remove('active')
 }
