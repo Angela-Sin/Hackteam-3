@@ -334,17 +334,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Resume the game
-    document.getElementById('resumeButton').addEventListener('click', function () {
+    document.getElementById('resumeButton').addEventListener('click', function() {
         togglePause();
     });
 
     // Quit the game
-    document.getElementById('quitButton').addEventListener('click', function () {
+    document.getElementById('quitButton').addEventListener('click', function() {
         window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
     });
 
     // Listen for the Escape key to toggle pause
-    document.addEventListener('keydown', function (event) {
+    document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && gameStarted) {
             togglePause();
         }
@@ -435,41 +435,3 @@ document.addEventListener('DOMContentLoaded', function () {
         animate();
     });
 });
-
-// js for modal
-const openModalButtons = document.querySelectorAll('[data-modal-target]')
-const closeModalButtons = document.querySelectorAll('[data-close-button]')
-const overlay = document.getElementById('overlay')
-
-openModalButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const modal = document.querySelector(button.dataset.modalTarget)
-        openModal(modal)
-    })
-})
-
-overlay.addEventListener('click', () => {
-    const modals = document.querySelectorAll('.modal.active')
-    modals.forEach(modal => {
-        closeModal(modal)
-    })
-})
-
-closeModalButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const modal = button.closest('.modal')
-        closeModal(modal)
-    })
-})
-
-function openModal(modal) {
-    if (modal == null) return
-    modal.classList.add('active')
-    overlay.classList.add('active')
-}
-
-function closeModal(modal) {
-    if (modal == null) return
-    modal.classList.remove('active')
-    overlay.classList.remove('active')
-}
