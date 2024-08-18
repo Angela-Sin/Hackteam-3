@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameStarted = false;
     let selectedDifficulty = 'normal'; // Default difficulty
     let canDropBomb = true;
+    let isPaused = false; // Track if the game is paused
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         update() {
-            if (this.gameOver || !gameStarted) return;
+            if (this.gameOver || !gameStarted || isPaused) return;
             this.x += this.speed * this.direction;
 
             // Change direction and move down when reaching canvas boundaries
@@ -100,14 +101,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Array to hold projectiles
     const projectiles = [];
 
-    // buildings
+    // Buildings setup
     const minHeight = 20;
     const buildingWidth = 20;
     const maxBuildingHeight = 150;
     const buildingGap = 3;
     const canvasEndGap = 10;
     const buildings = [];
- 
+
     class Building {
         constructor(x, width, health) {
             this.x = x;
@@ -121,13 +122,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
         }
-   
+
         selectSprite() {
             if (this.health === 3) return tallBuildingSprite;
             if (this.health === 2) return medBuildingSprite;
             return smallBuildingSprite;
         }
-   
+
         draw() {
             const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
             ctx.drawImage(
@@ -137,8 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x, this.y,
                 this.width, this.height
             );
-           
-            // Draw health bar   -    temp for checking hits
+
+            // Draw health bar - temporary for checking hits
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
             ctx.fillStyle = 'red';
@@ -146,23 +147,23 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = 'green';
             ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
-   
+
         hit() {
             this.health--;
             if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
         }
-   
+
         isDestroyed() {
             return this.health <= 0;
         }
     }
-   
+
     function createBuildings() {
         buildings.length = 0;
         let x = canvasEndGap;
         const buildingWidth = 40;
         const buildingGap = 1;
-       
+
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
             const health = Math.floor(Math.random() * 3) + 1;
             buildings.push(new Building(x, buildingWidth, health));
@@ -289,7 +290,44 @@ document.addEventListener('DOMContentLoaded', function() {
         createBuildings();
         projectiles.length = 0;
         canDropBomb = true;
+        isPaused = false; // Ensure the game is not paused when starting
     }
+
+    // Function to toggle pause state and show/hide modal
+    function togglePause() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            showPauseMenu();
+        } else {
+            hidePauseMenu();
+        }
+    }
+
+    // Show and hide the modal
+    function showPauseMenu() {
+        document.getElementById('pauseModal').style.display = 'block';
+    }
+
+    function hidePauseMenu() {
+        document.getElementById('pauseModal').style.display = 'none';
+    }
+
+    // Resume the game
+    document.getElementById('resumeButton').addEventListener('click', function() {
+        togglePause();
+    });
+
+    // Quit the game
+    document.getElementById('quitButton').addEventListener('click', function() {
+        window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
+    });
+
+    // Listen for the Escape key to toggle pause
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && gameStarted) {
+            togglePause();
+        }
+    });
 
     // Animation loop
     let colorIndex = 0;
@@ -306,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function animate() {
         if (!gameStarted) {
             drawDifficultySelection();
-        } else {
+        } else if (!isPaused) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBuildings();
             drawProjectiles();
