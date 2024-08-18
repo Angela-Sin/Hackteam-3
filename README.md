@@ -117,9 +117,8 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 ## Features
 
-- Responsive on all device sizes
-
 - Interactive elements
+- Challenge
 
 ## Technologies Used
 
@@ -141,8 +140,6 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 ### Further Testing
 
 - The Website was tested on Google Chrome, Internet Explorer, Microsoft Edge and Safari browsers.
-- The website was viewed on a variety of devices such as Desktop, Laptop, iPhone7, iPhone 8 & iPhoneX.
-- A large amount of testing was done to ensure that all pages were linking correctly.
 - Friends and family members were asked to review the site and documentation to point out any bugs and/or user experience issues.
 
 ### Future addings
@@ -199,10 +196,6 @@ By forking the GitHub Repository we make a copy of the original repository on ou
 > Unpacking objects: 100% (10/10), done.
 
 Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#cloning-a-repository-to-github-desktop) to retrieve pictures for some of the buttons and more detailed explanations of the above process.
-
-## Credits
-
-### Code
 
 ### Content
 
