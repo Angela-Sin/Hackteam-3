@@ -1,22 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Load sound effects
-    const sounds = {
-        bombDrop: new Audio('assets/media/sounds/bombDrop.mp3'),
-        bombHit: new Audio('assets/media/sounds/bombHit.mp3'),
-        bombMiss: new Audio('assets/media/sounds/bombMiss.mp3'),
-        levelChange: new Audio('assets/media/sounds/levelChange.mp3'),
-        gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
-        gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
-        gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
-        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
-    };
-
-    // Ensure volume is set (default is 1.0)
-    Object.values(sounds).forEach(sound => sound.volume = 1.0);
-
-    // Play background music in a loop
-    sounds.backgroundMusic.loop = true;
-
     // Canvas setup
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -29,6 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedDifficulty = 'normal'; // Default difficulty
     let canDropBomb = true;
     let isPaused = false; // Track if the game is paused
+
+    // Load sounds
+    const sounds = {
+        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3'),
+        bombDrop: new Audio('assets/media/sounds/bombDrop.mp3'),
+        gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
+        levelChange: new Audio('assets/media/sounds/levelChange.mp3')
+    };
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
@@ -77,6 +67,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (this.y + this.height / 2 >= canvas.height) {
                     this.gameOver = true;
                     this.y = canvas.height - this.height / 2;
+                    sounds.gameOver.play(); // Play game over sound
+                    sounds.backgroundMusic.pause(); // Stop background music
                 }
             }
         }
@@ -157,11 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.width, this.height
             );
 
-<<<<<<< HEAD
-            // Draw health bar   -    temp for checking hits
-=======
             // Draw health bar - temporary for checking hits
->>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
             ctx.fillStyle = 'red';
@@ -231,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     simulateCollision(building);
                     score++;
                     projectile.active = false; // Deactivate projectile
-                    sounds.bombHit.play(); // Play bomb hit sound
                 }
             });
         });
@@ -275,55 +262,54 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event listener for difficulty selection
     document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
-            if (event.key === '1' || event.key === '2' || event.key === '3') {
-                selectedDifficulty = event.key === '1' ? 'easy' : event.key === '2' ? 'normal' : 'hard';
-                sounds.levelChange.play();
-                startGame(); // Start game after difficulty is selected
+            if (event.key === '1') {
+                selectedDifficulty = 'easy';
+                sounds.levelChange.play(); // Play difficulty change sound
+                startGame();
+            } else if (event.key === '2') {
+                selectedDifficulty = 'normal';
+                sounds.levelChange.play(); // Play difficulty change sound
+                startGame();
+            } else if (event.key === '3') {
+                selectedDifficulty = 'hard';
+                sounds.levelChange.play(); // Play difficulty change sound
+                startGame();
             }
-        } else if (event.key === ' ' && canDropBomb) {
-            dropBomb(); // Drop bomb with sound
-        }
-    });
-
-    // Similar mouse interaction to start sounds
-    canvas.addEventListener('mousedown', function (event) {
-        if (!gameStarted) {
-            startGame(); // Start game on click, allow sounds
-        } else if (canDropBomb) {
-            dropBomb(); // Drop bomb with sound
-        }
-    });
-
-    function drawScore() {
-        ctx.fillStyle = 'yellow';
-        ctx.fillText('Score: ' + score, 20, 50);
-    }
-
-    function dropBomb() {
-        if (canDropBomb) {
+        } else if (event.key === ' ' && canDropBomb) { // Space key to drop projectile
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            sounds.bombDrop.play(); // Play bomb drop sound
             canDropBomb = false;
-            sounds.bombDrop.play();
+        }
+    });
+
+    // Event listeners for mouse input
+    canvas.addEventListener('mousedown', function (event) {
+        if (gameStarted && canDropBomb) {
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            sounds.bombDrop.play(); // Play bomb drop sound
+            canDropBomb = false;
+        }
+    });
+
+    // Allow dropping another bomb when the previous one lands
+    function checkIfCanDropBomb() {
+        if (projectiles.every(p => !p.active)) {
+            canDropBomb = true;
         }
     }
 
+    // Start the game
     function startGame() {
-        sounds.backgroundMusic.play(); // Start music after user interaction
         gameStarted = true;
         player.reset();
         createBuildings();
         projectiles.length = 0;
         canDropBomb = true;
         isPaused = false; // Ensure the game is not paused when starting
+        sounds.backgroundMusic.loop = true; // Loop background music
+        sounds.backgroundMusic.play(); // Start background music
     }
 
-<<<<<<< HEAD
-    function handleGameOver() {
-        if (player.gameOver) {
-            sounds.backgroundMusic.pause(); // Stop background music
-            sounds.gameOver.play(); // Play game over sound
-        }
-=======
     // Function to toggle pause state and show/hide modal
     function togglePause() {
         isPaused = !isPaused;
@@ -344,17 +330,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Resume the game
-    document.getElementById('resumeButton').addEventListener('click', function() {
+    document.getElementById('resumeButton').addEventListener('click', function () {
         togglePause();
     });
 
     // Quit the game
-    document.getElementById('quitButton').addEventListener('click', function() {
+    document.getElementById('quitButton').addEventListener('click', function () {
         window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
     });
 
     // Listen for the Escape key to toggle pause
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && gameStarted) {
             togglePause();
         }
@@ -367,65 +353,79 @@ document.addEventListener('DOMContentLoaded', function () {
     function getNextColor() {
         colorIndex = (colorIndex + 1) % colors.length;
         return colors[colorIndex];
->>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
     }
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let frameCount = 0;
+    let currentColor = colors[colorIndex];
 
+    function animate() {
         if (!gameStarted) {
             drawDifficultySelection();
-<<<<<<< HEAD
-        } else {
-=======
         } else if (!isPaused) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBuildings();
             drawProjectiles();
->>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
             player.update();
+            player.draw();
             updateProjectiles();
             handleProjectileCollisions();
-            drawBuildings();
-            drawProjectiles();
-            drawScore();
-            player.draw();
-            handleGameOver();
-        }
+            handleCollisions();
+            checkIfCanDropBomb();
 
+            if (player.gameOver) {
+                frameCount++;
+                if (frameCount % 15 === 0) {
+                    currentColor = getNextColor();
+                }
+                ctx.fillStyle = currentColor;
+                ctx.font = '60px Pixelify Sans';
+                ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
+
+                if (frameCount > 1000) {
+                    gameStarted = false;
+                    frameCount = 0;
+                    colorIndex = 0;
+                    currentColor = colors[colorIndex];
+                    score = 0;
+                }
+            }
+        }
         requestAnimationFrame(animate);
     }
 
+    // Initialize the game after sprites are loaded
+    let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
+
+    // preloadSprites function
     function preloadSprites(callback) {
-        const spriteSheet1 = new Image();
-        const spriteSheet2 = new Image();
-        const spriteSheet3 = new Image();
-        const playerImg = new Image();
+        let loadedCount = 0;
+        const totalSprites = 4;
 
-        let loadedSprites = 0;
-        const spriteLoaded = () => {
-            loadedSprites++;
-            if (loadedSprites === 4) callback();
-        };
+        function onLoad() {
+            loadedCount++;
+            if (loadedCount === totalSprites) {
+                player = new Player();
+                createBuildings();
+                callback();
+            }
+        }
 
-        spriteSheet1.src = 'assets/images/buildings/spritesheet1.png';
-        spriteSheet2.src = 'assets/images/buildings/spritesheet2.png';
-        spriteSheet3.src = 'assets/images/buildings/spritesheet3.png';
-        playerImg.src = 'assets/images/playerSprite.png';
+        playerSprite = new Image();
+        playerSprite.onload = onLoad;
+        playerSprite.src = 'assets/media/ufo.png';
 
-        spriteSheet1.onload = spriteLoaded;
-        spriteSheet2.onload = spriteLoaded;
-        spriteSheet3.onload = spriteLoaded;
-        playerImg.onload = spriteLoaded;
+        tallBuildingSprite = new Image();
+        tallBuildingSprite.onload = onLoad;
+        tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
 
-        smallBuildingSprite = spriteSheet1;
-        medBuildingSprite = spriteSheet2;
-        tallBuildingSprite = spriteSheet3;
-        playerSprite = playerImg;
+        medBuildingSprite = new Image();
+        medBuildingSprite.onload = onLoad;
+        medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
+
+        smallBuildingSprite = new Image();
+        smallBuildingSprite.onload = onLoad;
+        smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
     }
-
-    // Initialize the player
-    player = new Player();
 
     preloadSprites(() => {
         animate();
@@ -439,34 +439,34 @@ const closeModalButtons = document.querySelectorAll('[data-close-button]')
 const overlay = document.getElementById('overlay')
 
 openModalButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const modal = document.querySelector(button.dataset.modalTarget)
-    openModal(modal)
-  })
+    button.addEventListener('click', () => {
+        const modal = document.querySelector(button.dataset.modalTarget)
+        openModal(modal)
+    })
 })
 
 overlay.addEventListener('click', () => {
-  const modals = document.querySelectorAll('.modal.active')
-  modals.forEach(modal => {
-    closeModal(modal)
-  })
+    const modals = document.querySelectorAll('.modal.active')
+    modals.forEach(modal => {
+        closeModal(modal)
+    })
 })
 
 closeModalButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const modal = button.closest('.modal')
-    closeModal(modal)
-  })
+    button.addEventListener('click', () => {
+        const modal = button.closest('.modal')
+        closeModal(modal)
+    })
 })
 
 function openModal(modal) {
-  if (modal == null) return
-  modal.classList.add('active')
-  overlay.classList.add('active')
+    if (modal == null) return
+    modal.classList.add('active')
+    overlay.classList.add('active')
 }
 
 function closeModal(modal) {
-  if (modal == null) return
-  modal.classList.remove('active')
-  overlay.classList.remove('active')
+    if (modal == null) return
+    modal.classList.remove('active')
+    overlay.classList.remove('active')
 }
