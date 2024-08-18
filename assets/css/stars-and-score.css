@@ -8,6 +8,14 @@
    overflow: hidden;
  }
 
+ /* Score board */
+ #scoreBoard {
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 30px;
+  margin-bottom: 10px;
+  color: white; 
+}
+
  #stars,
  #stars1,
  #stars2 {
