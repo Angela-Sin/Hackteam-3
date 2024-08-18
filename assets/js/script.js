@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let score = 0;
     let gameStarted = false;
     let selectedDifficulty = 'normal'; // Default difficulty
+    let canDropBomb = true;
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
-
 
     // Difficulty settings
     const difficultySettings = {
@@ -63,6 +63,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Projectile class
+    class Projectile {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.radius = 10;
+            this.speed = 5;
+            this.active = true;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        update() {
+            this.y += this.speed;
+            if (this.y - this.radius > canvas.height) {
+                this.active = false;
+            }
+        }
+
+        checkCollision(building) {
+            const dx = this.x - (building.x + building.width / 2);
+            const dy = this.y - (building.y + building.height / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            return distance < this.radius + Math.min(building.width, building.height) / 2;
+        }
+    }
+
+    // Array to hold projectiles
+    const projectiles = [];
+
     // buildings
     const minHeight = 20;
     const buildingWidth = 20;
@@ -70,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buildingGap = 3;
     const canvasEndGap = 10;
     const buildings = [];
-  
+ 
     class Building {
         constructor(x, width, health) {
             this.x = x;
@@ -84,13 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
         }
-    
+   
         selectSprite() {
             if (this.health === 3) return tallBuildingSprite;
             if (this.health === 2) return medBuildingSprite;
             return smallBuildingSprite;
         }
-    
+   
         draw() {
             const spriteX = (this.maxHealth - this.health) * this.spriteWidth;
             ctx.drawImage(
@@ -100,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x, this.y,
                 this.width, this.height
             );
-            
+           
             // Draw health bar   -    temp for checking hits
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
@@ -109,25 +146,25 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = 'green';
             ctx.fillRect(this.x, this.y - healthBarHeight - 2, this.width * healthPercentage, healthBarHeight);
         }
-    
+   
         hit() {
             this.health--;
             if (this.health < 0) this.health = 0; // Ensure health doesn't go below zero
         }
-    
+   
         isDestroyed() {
             return this.health <= 0;
         }
     }
-    
+   
     function createBuildings() {
         buildings.length = 0;
         let x = canvasEndGap;
         const buildingWidth = 40;
         const buildingGap = 1;
-        
+       
         while (x + buildingWidth <= canvas.width - canvasEndGap) {
-            const health = Math.floor(Math.random() * 3) + 1; 
+            const health = Math.floor(Math.random() * 3) + 1;
             buildings.push(new Building(x, buildingWidth, health));
             x += buildingWidth + buildingGap;
         }
@@ -150,29 +187,55 @@ document.addEventListener('DOMContentLoaded', function() {
         buildings.forEach(building => building.draw());
     }
 
+    function drawProjectiles() {
+        projectiles.forEach(projectile => projectile.draw());
+    }
+
+    function updateProjectiles() {
+        projectiles.forEach(projectile => {
+            projectile.update();
+            if (!projectile.active) {
+                const index = projectiles.indexOf(projectile);
+                if (index > -1) projectiles.splice(index, 1);
+            }
+        });
+    }
+
+    function handleProjectileCollisions() {
+        projectiles.forEach(projectile => {
+            buildings.forEach(building => {
+                if (projectile.checkCollision(building)) {
+                    simulateCollision(building);
+                    score++;
+                    projectile.active = false; // Deactivate projectile
+                }
+            });
+        });
+    }
+
     let lastHitBuilding = null;
 
-function handleCollisions() {
-    let collision = false;
-    buildings.forEach(building => {
-        if (
-            player.x + player.width / 2 > building.x &&
-            player.x - player.width / 2 < building.x + building.width &&
-            player.y + player.height / 2 > building.y &&
-            player.y - player.height / 2 < building.y + building.height
-        ) {
-            if (building !== lastHitBuilding) {
-                simulateCollision(building);
-                score++;
-                lastHitBuilding = building;
-                collision = true;
+    function handleCollisions() {
+        let collision = false;
+        buildings.forEach(building => {
+            if (
+                player.x + player.width / 2 > building.x &&
+                player.x - player.width / 2 < building.x + building.width &&
+                player.y + player.height / 2 > building.y &&
+                player.y - player.height / 2 < building.y + building.height
+            ) {
+                if (building !== lastHitBuilding) {
+                    simulateCollision(building);
+                    score++;
+                    lastHitBuilding = building;
+                    collision = true;
+                }
             }
+        });
+        if (!collision) {
+            lastHitBuilding = null;
         }
-    });
-    if (!collision) {
-        lastHitBuilding = null;
     }
-}
 
     // Draw the difficulty selection screen
     function drawDifficultySelection() {
@@ -198,14 +261,34 @@ function handleCollisions() {
                 selectedDifficulty = 'hard';
                 startGame();
             }
+        } else if (event.key === ' ' && canDropBomb) { // Space key to drop projectile
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            canDropBomb = false;
         }
     });
+
+    // Event listeners for mouse input
+    canvas.addEventListener('mousedown', function(event) {
+        if (gameStarted && canDropBomb) {
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            canDropBomb = false;
+        }
+    });
+
+    // Allow dropping another bomb when the previous one lands
+    function checkIfCanDropBomb() {
+        if (projectiles.every(p => !p.active)) {
+            canDropBomb = true;
+        }
+    }
 
     // Start the game
     function startGame() {
         gameStarted = true;
         player.reset();
         createBuildings();
+        projectiles.length = 0;
+        canDropBomb = true;
     }
 
     // Animation loop
@@ -226,9 +309,13 @@ function handleCollisions() {
         } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBuildings();
+            drawProjectiles();
             player.update();
             player.draw();
+            updateProjectiles();
+            handleProjectileCollisions();
             handleCollisions();
+            checkIfCanDropBomb();
 
             if (player.gameOver) {
                 frameCount++;
@@ -254,36 +341,36 @@ function handleCollisions() {
     // Initialize the game after sprites are loaded
     let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
 
-// preloadSprites function
-function preloadSprites(callback) {
-    let loadedCount = 0;
-    const totalSprites = 4;
+    // preloadSprites function
+    function preloadSprites(callback) {
+        let loadedCount = 0;
+        const totalSprites = 4;
 
-    function onLoad() {
-        loadedCount++;
-        if (loadedCount === totalSprites) {
-            player = new Player();
-            createBuildings();
-            callback();
+        function onLoad() {
+            loadedCount++;
+            if (loadedCount === totalSprites) {
+                player = new Player();
+                createBuildings();
+                callback();
+            }
         }
+
+        playerSprite = new Image();
+        playerSprite.onload = onLoad;
+        playerSprite.src = 'assets/media/ufo.png';
+
+        tallBuildingSprite = new Image();
+        tallBuildingSprite.onload = onLoad;
+        tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
+
+        medBuildingSprite = new Image();
+        medBuildingSprite.onload = onLoad;
+        medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
+
+        smallBuildingSprite = new Image();
+        smallBuildingSprite.onload = onLoad;
+        smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
     }
-
-    playerSprite = new Image();
-    playerSprite.onload = onLoad;
-    playerSprite.src = 'assets/media/ufo.png';
-
-    tallBuildingSprite = new Image();
-    tallBuildingSprite.onload = onLoad;
-    tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
-
-    medBuildingSprite = new Image();
-    medBuildingSprite.onload = onLoad;
-    medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
-
-    smallBuildingSprite = new Image();
-    smallBuildingSprite.onload = onLoad;
-    smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
-}
 
     preloadSprites(() => {
         animate();
