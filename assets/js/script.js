@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let gameStarted = false;
     let selectedDifficulty = 'normal'; // Default difficulty
     let canDropBomb = true;
+    let isPaused = false; // Track if the game is paused
 
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         update() {
-            if (this.gameOver || !gameStarted) return;
+            if (this.gameOver || !gameStarted || isPaused) return;
             this.x += this.speed * this.direction;
 
             // Change direction and move down when reaching canvas boundaries
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Array to hold projectiles
     const projectiles = [];
 
-    // buildings
+    // Buildings setup
     const minHeight = 20;
     const buildingWidth = 20;
     const maxBuildingHeight = 150;
@@ -156,7 +157,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.width, this.height
             );
 
+<<<<<<< HEAD
             // Draw health bar   -    temp for checking hits
+=======
+            // Draw health bar - temporary for checking hits
+>>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
             const healthBarHeight = 5;
             const healthPercentage = this.health / this.maxHealth;
             ctx.fillStyle = 'red';
@@ -309,13 +314,60 @@ document.addEventListener('DOMContentLoaded', function () {
         createBuildings();
         projectiles.length = 0;
         canDropBomb = true;
+        isPaused = false; // Ensure the game is not paused when starting
     }
 
+<<<<<<< HEAD
     function handleGameOver() {
         if (player.gameOver) {
             sounds.backgroundMusic.pause(); // Stop background music
             sounds.gameOver.play(); // Play game over sound
         }
+=======
+    // Function to toggle pause state and show/hide modal
+    function togglePause() {
+        isPaused = !isPaused;
+        if (isPaused) {
+            showPauseMenu();
+        } else {
+            hidePauseMenu();
+        }
+    }
+
+    // Show and hide the modal
+    function showPauseMenu() {
+        document.getElementById('pauseModal').style.display = 'block';
+    }
+
+    function hidePauseMenu() {
+        document.getElementById('pauseModal').style.display = 'none';
+    }
+
+    // Resume the game
+    document.getElementById('resumeButton').addEventListener('click', function() {
+        togglePause();
+    });
+
+    // Quit the game
+    document.getElementById('quitButton').addEventListener('click', function() {
+        window.location.href = "mainmenu.html"; // Redirect to a main menu or another page
+    });
+
+    // Listen for the Escape key to toggle pause
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && gameStarted) {
+            togglePause();
+        }
+    });
+
+    // Animation loop
+    let colorIndex = 0;
+    const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
+
+    function getNextColor() {
+        colorIndex = (colorIndex + 1) % colors.length;
+        return colors[colorIndex];
+>>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
     }
 
     function animate() {
@@ -323,7 +375,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!gameStarted) {
             drawDifficultySelection();
+<<<<<<< HEAD
         } else {
+=======
+        } else if (!isPaused) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBuildings();
+            drawProjectiles();
+>>>>>>> bcfc6674cc2797816b9ce232dba6422e4a51f8b4
             player.update();
             updateProjectiles();
             handleProjectileCollisions();
@@ -372,3 +431,42 @@ document.addEventListener('DOMContentLoaded', function () {
         animate();
     });
 });
+
+// js for modal
+
+const openModalButtons = document.querySelectorAll('[data-modal-target]')
+const closeModalButtons = document.querySelectorAll('[data-close-button]')
+const overlay = document.getElementById('overlay')
+
+openModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = document.querySelector(button.dataset.modalTarget)
+    openModal(modal)
+  })
+})
+
+overlay.addEventListener('click', () => {
+  const modals = document.querySelectorAll('.modal.active')
+  modals.forEach(modal => {
+    closeModal(modal)
+  })
+})
+
+closeModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = button.closest('.modal')
+    closeModal(modal)
+  })
+})
+
+function openModal(modal) {
+  if (modal == null) return
+  modal.classList.add('active')
+  overlay.classList.add('active')
+}
+
+function closeModal(modal) {
+  if (modal == null) return
+  modal.classList.remove('active')
+  overlay.classList.remove('active')
+}
