@@ -1,6 +1,6 @@
 # Retro Gaming Hackathon
 
-![Retro Gaming Hackathon Logo](assets/images/Screenshot%202024-08-19%20101722.png)
+![Retro Gaming Hackathon Logo](assets/images/start%20page.png)
 
 **Welcome to our Retro Gaming Hackathon project!** 🎮
 
@@ -10,9 +10,18 @@
 
 We are a passionate team of developers and designers participating in the Code Institute Retro Gaming Hackathon. Our team is excited to blend our love for retro games with our technical skills to create a unique gaming experience.
 
+Creators Kiree Bellamy, Kim Hanlon, Angela Siniavskaja, Ahmad Al Hindi, Amir Ahmed, Catherine Parrish.
+
 ## Project Overview
 
-Welcome to "Invasion 83" thrilling  alien invasion  game where you' will be trying to destroy city. Creators @Kiree Bellamy, @Kim Hanlon, @Angela Siniavskaja, @Ahmad Al Hindi, @Amir Ahmed, @Catherine Parrish.  In "Invasion 83", you are a alien pilot.  You'll have to use your bombs to clear the city below so you can land safely. You can drop only one bomb, meaning that you cannot drop a bomb before the previous one hits the ground. You gradually lose height, and if you don't clear all the buildings in time, you're dead.  If you land your plane safely, you'll advance to the next level, which is exactly the same story except with a different (random) city layout.As You can see in pictures below in landing page you can find three different levels game provide. By pressing the number which level player choose, player will be automatically converted to an playing page. By pressing 'ESC' player can stop the game.
+Welcome to "Invasion 83" an exciting alien invasion game, inspired by the Vic20 game 'blitz', you're the alien trying to destroy cities.
+
+In "Invasion 83", you are the alien pilot. You'll have to use your bombs to clear the city below so you can land safely. You can drop only one bomb at a time, sorry no spam clicking! As you progress you gradually lose height, but remember, if you don't clear all the buildings, you're loose. If you are succesful, you win! Then you advance to the next level.
+
+- Controls:
+  - Number keys to select difficulty,
+  - Space or click to fire,
+  - Escape to access pause menu
 
 # Invasion 83
 
@@ -56,7 +65,6 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 - **As a player, I want to be able to read credits.**
 
   - Include a credits screen at the end of the game.
-  - The screen shows the team members names, like ye' olden days.
 
 - **As a player, I want a menu in game that gives me the options.**
 
@@ -115,6 +123,8 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 - ### Wireframes
 
+  - Welcome Page - ![Wireframes](./assets/images/Welcome.png)
+
   - Landing Page - ![Wireframes](./assets/media/Screenshot%202024-08-18%20123954.png)
 
   - Home Page Game - ![Wireframe](./assets/media/Screenshot%202024-08-18%20123938.png)
@@ -154,8 +164,10 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 The W3C Markup Validator and W3C CSS Validator Services were used to validate every page of the project to ensure there were no syntax errors in the project.
 
-- [W3C Markup Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
-- [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
+- [W3C Markup Validator](https://jigsaw.w3.org/css-validator/#validate_by_input)
+  ![HTML](./assets/images/HTML.png)
+- [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input)
+  ![results](./assets/images/CSS.png)
 
 ### Further Testing
 
@@ -167,6 +179,7 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 - The game should handle different sprite sizes and ensure they fit within its visual design.
 - Reorganise JavaScript into modules for modernisation and readability please.
 - ![Spider](./assets/media/vecteezy_icon-alien-invader-two-tone-style-simple_4376341_1_cropped.png) This little character will be implemented in future as a crawling spider around the buildings.
+- More dificutie levels must be added.
 
 ## Getting Started
 
