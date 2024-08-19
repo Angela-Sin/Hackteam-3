@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('intro').style.display = 'flex';
         canvas.style.display = 'none';
     }
-    
+
     function hideIntro() {
         document.getElementById('intro').style.display = 'none';
         canvas.style.display = 'block';
@@ -371,20 +371,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape' && gameStarted) {
-        togglePause();
-    }
-});
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && gameStarted) {
+            togglePause();
+        }
+    });
 
-// Then update your event listeners:
-document.addEventListener('keydown', function (event) {
-    if (!gameStarted) {
-        // ... existing difficulty selection code ...
-    } else if (event.key === ' ') {
-        dropBomb();
-    }
-});
+    // Then update your event listeners:
+    document.addEventListener('keydown', function (event) {
+        if (!gameStarted) {
+            // ... existing difficulty selection code ...
+        } else if (event.key === ' ') {
+            dropBomb();
+        }
+    });
 
     canvas.addEventListener('mousedown', function (event) {
         dropBomb();
@@ -546,7 +546,7 @@ document.addEventListener('keydown', function (event) {
         document.getElementById('intro').style.display = 'flex';
         canvas.style.display = 'none';
     }
-   
+
 
     preloadSprites(() => {
         showIntro();
