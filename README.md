@@ -6,6 +6,8 @@
 
 - _An online, 8-bit, single button alien invasion game._
 
+Link for a game you can find here [Link](https://swewi.github.io/Invasion-83-Ht-3/)
+
 ## About Us
 
 We are a passionate team of developers and designers participating in the Code Institute Retro Gaming Hackathon. Our team is excited to blend our love for retro games with our technical skills to create a unique gaming experience.
@@ -22,6 +24,8 @@ In "Invasion 83", you are the alien pilot. You'll have to use your bombs to clea
   - Number keys to select difficulty,
   - Space or click to fire,
   - Escape to access pause menu
+
+Link for a game you can find here [Link](https://swewi.github.io/Invasion-83-Ht-3/)
 
 # Invasion 83
 
@@ -222,12 +226,12 @@ By forking the GitHub Repository we make a copy of the original repository on ou
 6. Type `git clone`, and then paste [https://github.com/YOUR-USERNAME/YOUR-REPOSITORY] in.
 7. Press Enter. Your local clone will be created.
 
-> $ git clone [https://github.com/YOUR-USERNAME/YOUR-REPOSITORY]
-> Cloning into `CI-Clone`...
-> remote: Counting objects: 10, done.
-> remote: Compressing objects: 100% (8/8), done.
-> remove: Total 10 (delta 1), reused 10 (delta 1)
-> Unpacking objects: 100% (10/10), done.
+8. $ git clone [https://github.com/YOUR-USERNAME/YOUR-REPOSITORY]
+9. Cloning into `CI-Clone`...
+10. remote: Counting objects: 10, done.
+11. remote: Compressing objects: 100% (8/8), done.
+12. remove: Total 10 (delta 1), reused 10 (delta 1)
+13. Unpacking objects: 100% (10/10), done.
 
 Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository#cloning-a-repository-to-github-desktop) to retrieve pictures for some of the buttons and more detailed explanations of the above process.
 
