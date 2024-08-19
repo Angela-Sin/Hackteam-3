@@ -81,6 +81,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     sounds.backgroundMusic.pause();
                 }
             }
+            // Check collision with buildings
+            this.checkBuildingCollisions();
+        }
+
+        checkBuildingCollisions() {
+            buildings.forEach(building => {
+                if (
+                    this.x + this.width / 2 > building.x &&
+                    this.x - this.width / 2 < building.x + building.width &&
+                    this.y + this.height / 2 > building.y &&
+                    this.y - this.height / 2 < building.y + building.height
+                ) {
+                    this.gameOver = true;
+                    sounds.gameOver.play();
+                    sounds.backgroundMusic.pause();
+                }
+            });
         }
     }
 
@@ -225,6 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (buildings.length === 0) {
                     score += 100;
                     gameWon = true;
+                    sounds.gameSuccess.play();
                 }
                 sounds.bombHit.play();
             }
