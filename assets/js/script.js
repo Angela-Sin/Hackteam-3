@@ -5,11 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     canvas.width = 800;
     canvas.height = 500;
 
-
     const scoreBoardDiv = document.createElement('div');
     scoreBoardDiv.id = 'scoreBoard';
     document.body.appendChild(scoreBoardDiv);
-
 
     // Game State Variables
     let score = 0;
@@ -19,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let difficultySelected = false;
     let gameWon = false;
     let isPaused = false;
-
 
     // Load sound effects
     const sounds = {
@@ -33,10 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
         backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
     };
 
-
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
-
 
     // Difficulty settings
     const difficultySettings = {
@@ -45,17 +40,14 @@ document.addEventListener('DOMContentLoaded', function () {
         hard: 7,
     };
 
-
     let player;
     let playerSprite;
-
 
     // Player class
     class Player {
         constructor() {
             this.reset();
         }
-
 
         reset() {
             this.width = 70;
@@ -68,11 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
             this.gameOver = false;
         }
 
-
         draw() {
             ctx.drawImage(playerSprite, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
-
 
         update() {
             if (this.gameOver || !gameStarted || isPaused) return;
@@ -112,8 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
                           this.y - this.height / 2,
                           this.width,
                           this.height);
-
-
         }
    
         update() {
@@ -129,19 +117,14 @@ document.addEventListener('DOMContentLoaded', function () {
                    this.x + this.width > building.x &&
                    this.y < building.visibleY + building.visibleHeight &&
                    this.y + this.height > building.visibleY;
-        }
-       
+        }      
     }
    
-
-
     // Array to hold projectiles
     const projectiles = [];
 
-
     // Buildings setup
     const buildings = [];
-
 
     // Building class
     class Building {
@@ -161,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
             this.visibleY = this.y + (this.height - this.visibleHeight);
         }
 
-
         calculateVisibleHeight() {
             const baseVisibleHeight = (() => {
                 if (this.sprite === tallBuildingSprite) {
@@ -176,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // Adjust visible height based on remaining health
             return baseVisibleHeight * (this.health / this.maxHealth);
         }
-
 
         draw() {
             let spriteX;
@@ -196,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         }
 
-
         hit() {
             if (!this.isDestroyed) {
                 this.health--;
@@ -207,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-
 
     function createBuildings() {
         buildings.length = 0;
@@ -232,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
     function simulateCollision(building) {
         if (building.health > 0) {
             building.hit();
@@ -248,23 +226,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     score += 100;
                     gameWon = true;
                 }
-
-
                 sounds.bombHit.play();
             }
         }
     }
 
-
     function drawBuildings() {
         buildings.forEach(building => building.draw());
     }
 
-
     function drawProjectiles() {
         projectiles.forEach(projectile => projectile.draw());
     }
-
 
     function updateProjectiles() {
         projectiles.forEach((projectile, index) => {
@@ -274,7 +247,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
 
     function handleProjectileCollisions() {
         projectiles.forEach((projectile, pIndex) => {
@@ -288,9 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
     let lastHitBuilding = null;
-
 
     function handleCollisions() {
         let collision = false;
@@ -314,20 +284,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
     function drawScore() {
         const scoreBoard = document.getElementById('scoreBoard');
         if (scoreBoard) {
             scoreBoard.textContent = 'Score: ' + score;
-        } else {
-            console.warn('ScoreBoard element not found');
-            // Optionally, draw score on canvas as a fallback
-            ctx.fillStyle = 'white';
-            ctx.font = '20px Pixelify Sans';
-            ctx.fillText('Score: ' + score, 10, 30);
-        }
+        } 
     }  
-
 
     function drawDifficultySelection() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -338,7 +300,6 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillText('2: Normal', canvas.width / 2 - 50, canvas.height / 2);
         ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
     }
-
 
     document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
@@ -362,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     });
 
-
     function dropBomb() {
     if (gameStarted && canDropBomb) {
         projectiles.push(new Projectile(player.x, player.y + player.height / 2));
@@ -370,7 +330,6 @@ document.addEventListener('DOMContentLoaded', function () {
         canDropBomb = false;
     }
 }
-
 
 // Then update your event listeners:
 document.addEventListener('keydown', function (event) {
@@ -381,18 +340,15 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-
     canvas.addEventListener('mousedown', function(event) {
     dropBomb();
 });
-
 
     function checkIfCanDropBomb() {
         if (projectiles.every(p => !p.active)) {
             canDropBomb = true;
         }
     }
-
 
     function startGame() {
         gameStarted = true;
@@ -406,7 +362,6 @@ document.addEventListener('keydown', function (event) {
         sounds.backgroundMusic.play();
     }
 
-
     function togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
@@ -416,26 +371,21 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-
     function showPauseMenu() {
         document.getElementById('pauseModal').style.display = 'block';
     }
-
 
     function hidePauseMenu() {
         document.getElementById('pauseModal').style.display = 'none';
     }
 
-
     document.getElementById('resumeButton').addEventListener('click', function() {
         togglePause();
     });
 
-
     document.getElementById('quitButton').addEventListener('click', function() {
         window.location.href = "mainmenu.html";
     });
-
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && gameStarted) {
@@ -443,20 +393,16 @@ document.addEventListener('keydown', function (event) {
         }
     });
 
-
     let colorIndex = 0;
     const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
-
 
     function getNextColor() {
         colorIndex = (colorIndex + 1) % colors.length;
         return colors[colorIndex];
     }
 
-
     let frameCount = 0;
     let currentColor = colors[colorIndex];
-
 
     function animate() {
         if (!gameStarted) {
@@ -473,7 +419,6 @@ document.addEventListener('keydown', function (event) {
             checkIfCanDropBomb();
             drawScore();
 
-
             if (gameWon || player.gameOver) {
                 frameCount++;
                 if (frameCount % 15 === 0) {
@@ -482,7 +427,6 @@ document.addEventListener('keydown', function (event) {
                 ctx.fillStyle = currentColor;
                 ctx.font = '60px Pixelify Sans';
                 ctx.fillText(gameWon ? 'You Win!' : 'Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
-
 
                 if (frameCount > 1000) {
                     gameStarted = false;
@@ -496,7 +440,6 @@ document.addEventListener('keydown', function (event) {
         }
         requestAnimationFrame(animate);
     }
-
 
     function preloadSprites(callback) {
         let loadedCount = 0;
@@ -527,14 +470,11 @@ document.addEventListener('keydown', function (event) {
         smallBuildingSprite.onload = onLoad;
         smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
    
-        // Load the projectile sprite
         projectileSprite = new Image();
         projectileSprite.onload = onLoad;
         projectileSprite.src = 'assets/media/bomb_sprite.png';
     }
    
-
-
     preloadSprites(() => {
         animate();
     });
