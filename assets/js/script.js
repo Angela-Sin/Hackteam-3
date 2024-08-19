@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
         gameOver: new Audio('assets/media/sounds/gameOver.mp3'),
         gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
         gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
-        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
-        mainMenu: new Audio('assets/media/sounds/mainMenu.mp3'),
+        backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3'),
+        mainMenu: new Audio('assets/media/sounds/mainMenu.mp3')
     };
 
     // Set up font for text rendering
@@ -301,16 +301,15 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillText('2: Normal', canvas.width / 2 - 50, canvas.height / 2);
         ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
 
-        // Play the main menu sound when the difficulty selection screen is shown
-        if (!difficultySelected && !sounds.mainMenu.playing) {
-            sounds.mainMenu.loop = true; // Loop the main menu music
+        // Play main menu music if it is not already playing
+        if (sounds.mainMenu.paused) {
+            sounds.mainMenu.loop = true; // Set to loop for the menu
             sounds.mainMenu.play();
         }
     }
 
     document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
-            // Handle difficulty selection
             if (event.key === '1') {
                 selectedDifficulty = 'easy';
                 sounds.levelChange.play();
@@ -324,13 +323,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 sounds.levelChange.play();
                 startGame();
             }
-        } else {
-            // Handle gameplay key events
-            if (event.key === ' ' && canDropBomb) {
-                dropBomb();
-            } else if (event.key === 'Escape') {
-                togglePause();
-            }
+        } else if (event.key === ' ' && gameStarted && canDropBomb) {
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            sounds.bombDrop.play();
+            canDropBomb = false;
         }
     });
 
@@ -369,11 +365,10 @@ document.addEventListener('DOMContentLoaded', function () {
         projectiles.length = 0;
         canDropBomb = true;
         isPaused = false;
-        // Stop the main menu sound when the game starts
+
+        // Stop main menu music and start background music
         sounds.mainMenu.pause();
         sounds.mainMenu.currentTime = 0;
-
-        // Play background music when the game starts
         sounds.backgroundMusic.loop = true;
         sounds.backgroundMusic.play();
     }
