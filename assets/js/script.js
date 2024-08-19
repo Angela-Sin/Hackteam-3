@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gameFail: new Audio('assets/media/sounds/gameFail.mp3'),
         gameSuccess: new Audio('assets/media/sounds/gameSuccess.mp3'),
         backgroundMusic: new Audio('assets/media/sounds/backgroundMusic.mp3')
+        mainMenu: new Audio('assets/media/sounds/mainMenu.mp3'),
     };
 
     // Set up font for text rendering
@@ -95,15 +96,15 @@ document.addEventListener('DOMContentLoaded', function () {
             this.speed = 5;
             this.active = true;
         }
-   
+
         draw() {
             ctx.drawImage(projectileSprite,
-                          this.x - this.width / 2,
-                          this.y - this.height / 2,
-                          this.width,
-                          this.height);
+                this.x - this.width / 2,
+                this.y - this.height / 2,
+                this.width,
+                this.height);
         }
-   
+
         update() {
             this.y += this.speed;
             if (this.y - this.height / 2 > canvas.height) {
@@ -111,15 +112,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 sounds.bombMiss.play();
             }
         }
-   
+
         checkCollision(building) {
             return this.x < building.x + building.width &&
-                   this.x + this.width > building.x &&
-                   this.y < building.visibleY + building.visibleHeight &&
-                   this.y + this.height > building.visibleY;
-        }      
+                this.x + this.width > building.x &&
+                this.y < building.visibleY + building.visibleHeight &&
+                this.y + this.height > building.visibleY;
+        }
     }
-   
+
     // Array to hold projectiles
     const projectiles = [];
 
@@ -147,14 +148,14 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateVisibleHeight() {
             const baseVisibleHeight = (() => {
                 if (this.sprite === tallBuildingSprite) {
-                    return this.height * 0.9;  // Base visible height for tall buildings
+                    return this.height * 0.9; // Base visible height for tall buildings
                 } else if (this.sprite === medBuildingSprite) {
-                    return this.height * 0.5;  // Base visible height for medium buildings
+                    return this.height * 0.5; // Base visible height for medium buildings
                 } else if (this.sprite === smallBuildingSprite) {
-                    return this.height * 0.3;  // Base visible height for small buildings
+                    return this.height * 0.3; // Base visible height for small buildings
                 }
             })();
-       
+
             // Adjust visible height based on remaining health
             return baseVisibleHeight * (this.health / this.maxHealth);
         }
@@ -167,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 spriteX = (this.maxHealth - this.health) * this.spriteWidth;
             }
-       
+
             ctx.drawImage(
                 this.sprite,
                 spriteX, 0,
@@ -193,10 +194,10 @@ document.addEventListener('DOMContentLoaded', function () {
         let x = 10; // canvasEndGap
         const buildingWidth = 40;
         const buildingGap = 1;
-   
+
         while (x + buildingWidth <= canvas.width - 10) {
             const health = Math.floor(Math.random() * 3) + 1;
-   
+
             let sprite;
             if (health === 3) {
                 sprite = tallBuildingSprite;
@@ -205,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 sprite = smallBuildingSprite;
             }
-   
+
             buildings.push(new Building(x, buildingWidth, health, sprite));
             x += buildingWidth + buildingGap;
         }
@@ -215,13 +216,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (building.health > 0) {
             building.hit();
             score += 10;
-           
+
             if (building.isDestroyed) {
                 const index = buildings.indexOf(building);
                 if (index > -1) {
                     buildings.splice(index, 1);
                 }
-               
+
                 if (buildings.length === 0) {
                     score += 100;
                     gameWon = true;
@@ -288,8 +289,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const scoreBoard = document.getElementById('scoreBoard');
         if (scoreBoard) {
             scoreBoard.textContent = 'Score: ' + score;
-        } 
-    }  
+        }
+    }
 
     function drawDifficultySelection() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -299,10 +300,17 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillText('1: Easy', canvas.width / 2 - 50, canvas.height / 2 - 50);
         ctx.fillText('2: Normal', canvas.width / 2 - 50, canvas.height / 2);
         ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
+
+        // Play the main menu sound when the difficulty selection screen is shown
+        if (!difficultySelected && !sounds.mainMenu.playing) {
+            sounds.mainMenu.loop = true; // Loop the main menu music
+            sounds.mainMenu.play();
+        }
     }
 
     document.addEventListener('keydown', function (event) {
         if (!gameStarted) {
+            // Handle difficulty selection
             if (event.key === '1') {
                 selectedDifficulty = 'easy';
                 sounds.levelChange.play();
@@ -316,33 +324,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 sounds.levelChange.play();
                 startGame();
             }
-        } else if (event.key === ' ' && gameStarted && canDropBomb) {
-        projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-        sounds.bombDrop.play();
-        canDropBomb = false;
-    }
+        } else {
+            // Handle gameplay key events
+            if (event.key === ' ' && canDropBomb) {
+                dropBomb();
+            } else if (event.key === 'Escape') {
+                togglePause();
+            }
+        }
     });
 
     function dropBomb() {
-    if (gameStarted && canDropBomb) {
-        projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-        sounds.bombDrop.play();
-        canDropBomb = false;
+        if (gameStarted && canDropBomb) {
+            projectiles.push(new Projectile(player.x, player.y + player.height / 2));
+            sounds.bombDrop.play();
+            canDropBomb = false;
+        }
     }
-}
 
-// Then update your event listeners:
-document.addEventListener('keydown', function (event) {
-    if (!gameStarted) {
-        // ... existing difficulty selection code ...
-    } else if (event.key === ' ') {
+    // Then update your event listeners:
+    document.addEventListener('keydown', function (event) {
+        if (!gameStarted) {
+            // ... existing difficulty selection code ...
+        } else if (event.key === ' ') {
+            dropBomb();
+        }
+    });
+
+    canvas.addEventListener('mousedown', function (event) {
         dropBomb();
-    }
-});
-
-    canvas.addEventListener('mousedown', function(event) {
-    dropBomb();
-});
+    });
 
     function checkIfCanDropBomb() {
         if (projectiles.every(p => !p.active)) {
@@ -358,6 +369,11 @@ document.addEventListener('keydown', function (event) {
         projectiles.length = 0;
         canDropBomb = true;
         isPaused = false;
+        // Stop the main menu sound when the game starts
+        sounds.mainMenu.pause();
+        sounds.mainMenu.currentTime = 0;
+
+        // Play background music when the game starts
         sounds.backgroundMusic.loop = true;
         sounds.backgroundMusic.play();
     }
@@ -391,17 +407,17 @@ document.addEventListener('keydown', function (event) {
         document.getElementById('pauseModal').style.display = 'none';
     }
 
-    document.getElementById('resumeButton').addEventListener('click', function() {
+    document.getElementById('resumeButton').addEventListener('click', function () {
         togglePause();
     });
 
-    document.getElementById('quitButton').addEventListener('click', function() {
+    document.getElementById('quitButton').addEventListener('click', function () {
         resetGame();
         hidePauseMenu();
         drawDifficultySelection();
     });
 
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && gameStarted) {
             togglePause();
         }
@@ -458,7 +474,7 @@ document.addEventListener('keydown', function (event) {
     function preloadSprites(callback) {
         let loadedCount = 0;
         const totalSprites = 5; // Incremented the count because we're adding a new sprite
-   
+
         function onLoad() {
             loadedCount++;
             if (loadedCount === totalSprites) {
@@ -467,28 +483,28 @@ document.addEventListener('keydown', function (event) {
                 callback();
             }
         }
-   
+
         playerSprite = new Image();
         playerSprite.onload = onLoad;
         playerSprite.src = 'assets/media/ufo.png';
-   
+
         tallBuildingSprite = new Image();
         tallBuildingSprite.onload = onLoad;
         tallBuildingSprite.src = 'assets/media/tall_buildingsprite.png';
-   
+
         medBuildingSprite = new Image();
         medBuildingSprite.onload = onLoad;
         medBuildingSprite.src = 'assets/media/med_buildingsprite.png';
-   
+
         smallBuildingSprite = new Image();
         smallBuildingSprite.onload = onLoad;
         smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
-   
+
         projectileSprite = new Image();
         projectileSprite.onload = onLoad;
         projectileSprite.src = 'assets/media/bomb_sprite.png';
     }
-   
+
     preloadSprites(() => {
         animate();
     });
