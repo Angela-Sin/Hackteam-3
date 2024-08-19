@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Metatags for Search Engines -->
-    <meta name="description" content="8-Bit, single button game similar to the Vic20 game Blitz">
-    <meta name="keywords" content="8-bit, Game, Retro, One button">
-    <title>Game</title>
+    <meta name="description"
+        content="8-Bit, single button game where you defend the city as an alien invader, inspired by the Vic20 game Blitz">
+    <meta name="keywords" content="8-bit, Retro Game, Alien, Single Button">
+    <title>Invasion 83: Alien Assault!</title>
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +16,7 @@
     <!-- Favicon -->
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%9B%B8%3C%2Ftext%3E%3C%2Fsvg%3E">
-    <!-- CSS stylesheet -->
+    <!-- CSS Stylesheets -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/stars-and-score.css">
 </head>
@@ -23,11 +24,11 @@
 <body>
 
     <header>
-
+        <!-- Empty header for future content -->
     </header>
 
     <main>
-        <h1>Invasion 83</h1>
+        <h1>Invasion 83: Alien Assault!</h1>
         <div id="scoreBoard"></div>
         <canvas id="canvas1"></canvas>
         <section class="wrapper">
@@ -35,6 +36,8 @@
             <div id="stars2"></div>
             <div id="stars3"></div>
         </section>
+
+        <!-- Pause Modal -->
         <div id="pauseModal" class="modal">
             <div class="modal-content">
                 <h2>Game Paused</h2>
@@ -42,35 +45,35 @@
                 <button id="quitButton">Quit</button>
             </div>
         </div>
+
+        <!-- Intro Screen -->
         <div id="intro">
             <div id="intro-content">
                 <p>
-                    Welcome to "Invasion 83" an exciting alien invasion game, inspired by the Vic20 game 'blitz', you're
-                    the
-                    alien trying to destroy cities.
+                    Welcome to "Invasion 83: Alien Assault!" – where you become the ultimate alien invader in a
+                    thrilling retro adventure! Inspired by the Vic20 classic 'Blitz,' it's your mission to blast cities
+                    and avoid a fiery crash landing.
                 </p>
                 <p>
-                    Creators Kiree Bellamy, Kim Hanlon, Angela Siniavskaja, Ahmad Al Hindi, Amir Ahmed, Catherine
+                    Created by Kiree Bellamy, Kim Hanlon, Angela Siniavskaja, Ahmad Al Hindi, Amir Ahmed, and Catherine
                     Parrish.
                 </p>
                 <p>
-                    In "Invasion 83", you are the alien pilot. You'll have to use your bombs to clear the city
-                    below so you can land safely. You can drop only one bomb at a time, sorry no spam clicking! As you
-                    progress you gradually lose height, but remember, if you don't clear all the buildings, you're
-                    loose. If
-                    you are succesful, you win! Then you advance to the next level.
+                    Take control as the alien pilot and clear the city below with your bombs. Remember, only one bomb at
+                    a time – no spam allowed! As you descend, the pressure's on: clear all buildings or face defeat.
+                    Succeed and soar to the next level!
                 </p>
                 <hr>
                 <p>
-                    Controls: Number keys to select difficulty, Space or click to fire, Escape to access pause menu
+                    Controls: Use number keys to choose your difficulty, Space or click to drop bombs, Escape to pause.
                 </p>
             </div>
-            <div id="pressAnyKey" class="press-key-text">Press Any Key to Start</div>
+            <div id="pressAnyKey" class="press-key-text">Press Any Key to Begin the Invasion!</div>
         </div>
     </main>
 
     <footer>
-
+        <!-- Empty footer for future content -->
     </footer>
 
     <!-- Scripts -->
