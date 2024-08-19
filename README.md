@@ -1,6 +1,6 @@
 # Retro Gaming Hackathon
 
-![Retro Gaming Hackathon Logo](assets/images/hackathonimage.jpg)
+![Retro Gaming Hackathon Logo](assets/images/Screenshot%202024-08-19%20101722.png)
 
 **Welcome to our Retro Gaming Hackathon project!** 🎮
 
@@ -12,7 +12,25 @@ We are a passionate team of developers and designers participating in the Code I
 
 ## Project Overview
 
-In this hackathon, our goal is to [Briefly describe your project, e.g., "bring classic arcade games into the modern era" or "design a brand-new retro-inspired game with innovative features"]. We believe our project will capture the nostalgia of retro gaming while introducing exciting new elements.
+Welcome to "Invasion 83" thrilling  alien invasion  game where you' will be trying to destroy city. Creators @Kiree Bellamy, @Kim Hanlon, @Angela Siniavskaja, @Ahmad Al Hindi, @Amir Ahmed, @Catherine Parrish.  In "Invasion 83", you are a alien pilot.  You'll have to use your bombs to clear the city below so you can land safely. You can drop only one bomb, meaning that you cannot drop a bomb before the previous one hits the ground. You gradually lose height, and if you don't clear all the buildings in time, you're dead.  If you land your plane safely, you'll advance to the next level, which is exactly the same story except with a different (random) city layout.As You can see in pictures below in landing page you can find three different levels game provide. By pressing the number which level player choose, player will be automatically converted to an playing page. By pressing 'ESC' player can stop the game.
+
+# Invasion 83
+
+### Landing Page
+
+![Landing](./assets/images/Landing.png)
+
+### Game in action
+
+![Game](./assets/images/Screenshot%202024-08-19%20081400.png)
+
+### Pause the game
+
+![Stop](<./assets/images/Stop%20(2).png>)
+
+### Winner
+
+![Winner](./assets/images/Winner.png)
 
 At first, Commodore tried to promote the new home computer (our favorite C64) by releasing a few simple games. Most of them was with boring design, but they all had a certain "charm". Super Blitz was one such game released by Commodore back in 1983, and it was no exception.
 
@@ -97,9 +115,11 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 - ### Wireframes
 
+  - Landing Page - ![Wireframes](./assets/media/Screenshot%202024-08-18%20123954.png)
+
   - Home Page Game - ![Wireframe](./assets/media/Screenshot%202024-08-18%20123938.png)
 
-  - Home Page Levels - ![Wireframes](./assets/media/Screenshot%202024-08-18%20123954.png)
+  - Pause Page - ![Wireframes](./assets/media/Stop.scren.png)
 
 - ### Color Pallete
 
@@ -107,9 +127,9 @@ In Super Blitz, you are a bomber pilot who is quickly running out of fuel. You'l
 
 - ## Images/Characters
 
-* Was createn by team member by using Pixilart [Pixalart](https://www.pixilart.com/draw)
+* Was createn by team member by using Pixilart [Pixalart](https://www.pixilart.com/draw) Except bomb_sprite, which comes from Freepik [Freepik](https://www.freepik.com/)
 
-  ![SpaceShip](assets/media/ufo.png) ![TallBuilding](./assets/media/tall_buildingsprite.png) ![SmallBuilding](./assets/media/small_buildingsprite.png) ![MedBuilding](./assets/media/med_buildingsprite.png)
+  ![SpaceShip](assets/media/ufo.png) ![TallBuilding](./assets/media/tall_buildingsprite.png) ![SmallBuilding](./assets/media/small_buildingsprite.png) ![MedBuilding](./assets/media/med_buildingsprite.png) ![Bomb](./assets/media/bomb_sprite_2_optimized.png)
 
 - ## Background
   For Star Flash effect was used Pastebin Library [Pastebin](https://pastebin.com/gEfdRwgc)
@@ -145,7 +165,8 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 ### Future addings
 
 - The game should handle different sprite sizes and ensure they fit within its visual design.
-- Reorganise JavaScript into modules for modernisation and readability please
+- Reorganise JavaScript into modules for modernisation and readability please.
+- ![Spider](./assets/media/vecteezy_icon-alien-invader-two-tone-style-simple_4376341_1_cropped.png) This little character will be implemented in future as a crawling spider around the buildings.
 
 ## Getting Started
 
@@ -215,6 +236,8 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 | [Pixilart](https://www.pixilart.com/draw)                                                                            | Across website | Chareacters creation         |
 | [Balsamiq](https://balsamiq.com/?gad_source=1&gclid=EAIaIQobChMI9-DR99b-hwMV9JtQBh0I3yMEEAAYASAAEgJTpPD_BwE)         | Across website | Wireframes creation          |
 | [Pixabay](https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=69233) | Across website | Sounds liabrary              |
+| [Freepic](https://www.freepik.com/)                                                                                  | Across website | Png Library                  |
+| [Simple](https://www.simpleimageresizer.com/upload)                                                                  | Across website | Png Resizer                  |
 
 ### Acknowledgements
 
