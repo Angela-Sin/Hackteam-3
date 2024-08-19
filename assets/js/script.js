@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let gameStarted = false;
     let selectedDifficulty = 'normal';
     let canDropBomb = true;
-    let difficultySelected = false;
-    let gameWon = false;
-    let isPaused = false;
+
+    let difficultySelected = false; // Track if difficulty is selected
+    let gameWon = false; // Track if the game is won
+    let isPaused = false; // Track if the game is paused
+
 
     // Load sound effects
     const sounds = {
@@ -49,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.reset();
         }
 
+        // Reset player properties
         reset() {
             this.width = 70;
             this.height = 70;
@@ -60,10 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
             this.gameOver = false;
         }
 
+        // Draw player sprite on canvas
         draw() {
             ctx.drawImage(playerSprite, this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
         }
 
+        // Update player position and handle game-over conditions
         update() {
             if (this.gameOver || !gameStarted || isPaused) return;
             this.x += this.speed * this.direction;
@@ -92,6 +97,8 @@ document.addEventListener('DOMContentLoaded', function () {
             this.active = true;
         }
 
+        // Draw projectile on canvas
+
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -100,11 +107,16 @@ document.addEventListener('DOMContentLoaded', function () {
             ctx.closePath();
         }
 
+        // Update projectile position and deactivate if it goes off-screen
+
         update() {
             this.y += this.speed;
             if (this.y - this.radius > canvas.height) {
                 this.active = false;
-                sounds.bombMiss.play();
+           
+        // Check if the projectile collides with a building
+
+                sounds.bombMiss.play(); // Play bomb miss sound
             }
         }
 
@@ -124,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const buildings = [];
 
     // Building class
+
     class Building {
         constructor(x, width, health, sprite) {
             this.x = x;
@@ -136,8 +149,11 @@ document.addEventListener('DOMContentLoaded', function () {
             this.scale = this.width / this.spriteWidth;
             this.height = this.spriteHeight * this.scale;
             this.y = canvas.height - this.height;
+
             this.isDestroyed = false;
         }
+
+        // Draw building and its health bar on canvas
 
         draw() {
             let spriteX;
@@ -156,7 +172,9 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         }
 
+        // Decrease health on hit
         hit() {
+
             if (!this.isDestroyed) {
                 this.health--;
                 if (this.health <= 0) {
@@ -171,8 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         buildings.length = 0;
         let x = 10; // canvasEndGap
         const buildingWidth = 40;
-        const buildingGap = 1;
-    
+        const buildingGap = 1;    
         while (x + buildingWidth <= canvas.width - 10) { // canvasEndGap
             const health = Math.floor(Math.random() * 3) + 1;
     
@@ -190,34 +207,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Simulate collision and update score
     function simulateCollision(building) {
         if (building.health > 0) {
-            building.hit();
-            score += 10;
+            building.hit(); // Decrease health
+            score += 10; // Increment score by 10 for each hit
             
-            if (building.isDestroyed) {
+            if (building.isDestroyed()) { // Remove building if health is zero
                 const index = buildings.indexOf(building);
                 if (index > -1) {
                     buildings.splice(index, 1);
                 }
-                
-                if (buildings.length === 0) {
-                    score += 100;
-                    gameWon = true;
-                }
-
                 sounds.bombHit.play();
+                // Check if all buildings are destroyed
+                if (buildings.length === 0) {
+                    score += 100; // Add 100 points if no buildings are left
+                    gameWon = true; // Set gameWon to true when all buildings are destroyed
+                }
+                sounds.bombHit.play(); // Play bomb hit sound
             }
         }
     }
 
+    // Draw all buildings on canvas
     function drawBuildings() {
         buildings.forEach(building => building.draw());
     }
 
+
     function drawProjectiles() {
         projectiles.forEach(projectile => projectile.draw());
     }
+
 
     function updateProjectiles() {
         projectiles.forEach((projectile, index) => {
@@ -228,22 +249,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Handle collisions between projectiles and buildings
     function handleProjectileCollisions() {
         projectiles.forEach((projectile, pIndex) => {
             buildings.forEach((building, bIndex) => {
                 if (projectile.checkCollision(building)) {
                     simulateCollision(building);
+
                     score++;
                     projectiles.splice(pIndex, 1);
                 }
             });
         });
     }
-
     let lastHitBuilding = null;
 
+    // Handle collisions between player and buildings
     function handleCollisions() {
-        let collision = false;
         buildings.forEach(building => {
             if (
                 player.x + player.width / 2 > building.x &&
@@ -251,32 +273,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 player.y + player.height / 2 > building.y &&
                 player.y - player.height / 2 < building.y + building.height
             ) {
-                if (building !== lastHitBuilding) {
-                    simulateCollision(building);
-                    score++;
-                    lastHitBuilding = building;
-                    collision = true;
-                }
+                player.gameOver = true; // Trigger game over on collision with building
             }
         });
-        if (!collision) {
-            lastHitBuilding = null;
-        }
     }
 
+
+    // Draw the current score on the screen
     function drawScore() {
         const scoreBoard = document.getElementById('scoreBoard');
-        if (scoreBoard) {
-            scoreBoard.textContent = 'Score: ' + score;
-        } else {
-            console.warn('ScoreBoard element not found');
-            // Optionally, draw score on canvas as a fallback
-            ctx.fillStyle = 'white';
-            ctx.font = '20px Pixelify Sans';
-            ctx.fillText('Score: ' + score, 10, 30);
-        }
-    }   
+        scoreBoard.textContent = 'Score: ' + score;
+    }    
 
+
+    // Draw the difficulty selection screen
     function drawDifficultySelection() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'yellow';
@@ -287,31 +297,37 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillText('3: Hard', canvas.width / 2 - 50, canvas.height / 2 + 50);
     }
 
-    document.addEventListener('keydown', function (event) {
-        if (!gameStarted) {
+
+
+    // Event listener for difficulty selection and projectile dropping
+    document.addEventListener('keydown', function(event) {
+        if (!gameStarted && !difficultySelected) {
             if (event.key === '1') {
                 selectedDifficulty = 'easy';
-                sounds.levelChange.play();
+                difficultySelected = true; // Mark difficulty as selected
                 startGame();
             } else if (event.key === '2') {
                 selectedDifficulty = 'normal';
-                sounds.levelChange.play();
+                difficultySelected = true; // Mark difficulty as selected
                 startGame();
             } else if (event.key === '3') {
                 selectedDifficulty = 'hard';
-                sounds.levelChange.play();
+                difficultySelected = true; // Mark difficulty as selected
                 startGame();
             }
-        } else if (event.key === ' ' && gameStarted && canDropBomb) {
+        } else if (event.key === ' ' && gameStarted && canDropBomb) { // Space key to drop projectile
+
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
             canDropBomb = false;
         }
     });
 
+
+    // Event listener for mouse input to drop projectiles
     canvas.addEventListener('mousedown', function(event) {
         if (gameStarted && canDropBomb) {
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
-            sounds.bombDrop.play();
+
             canDropBomb = false;
         }
     });
@@ -322,16 +338,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+
+    // Initialize game state and start the game
     function startGame() {
         gameStarted = true;
-        gameWon = false;
+        gameWon = false; // Reset gameWon
         player.reset();
         createBuildings();
         projectiles.length = 0;
         canDropBomb = true;
-        isPaused = false;
-        sounds.backgroundMusic.loop = true;
-        sounds.backgroundMusic.play();
+        isPaused = false; // Ensure the game is not paused when starting
+        sounds.backgroundMusic.loop = true; // Loop background music
+        sounds.backgroundMusic.play(); // Start background music
     }
 
     function togglePause() {
@@ -367,7 +385,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let colorIndex = 0;
     const colors = ['rgb(255, 255, 0)', 'rgb(128, 0, 128)', 'rgb(255, 165, 0)', 'rgb(255, 255, 255)', 'rgb(255, 0, 0)', 'rgb(0, 0, 0, 0)'];
-
     function getNextColor() {
         colorIndex = (colorIndex + 1) % colors.length;
         return colors[colorIndex];
@@ -392,17 +409,36 @@ document.addEventListener('DOMContentLoaded', function () {
             drawScore();
 
             if (gameWon || player.gameOver) {
+
                 frameCount++;
                 if (frameCount % 15 === 0) {
                     currentColor = getNextColor();
                 }
                 ctx.fillStyle = currentColor;
                 ctx.font = '60px Pixelify Sans';
-                ctx.fillText(gameWon ? 'You Win!' : 'Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
+
+                ctx.fillText('You Win!', canvas.width / 2 - 150, canvas.height / 2 - 50);
 
                 if (frameCount > 1000) {
                     gameStarted = false;
-                    difficultySelected = false;
+                    difficultySelected = false; // Allow difficulty selection again
+                    frameCount = 0;
+                    colorIndex = 0;
+                    currentColor = colors[colorIndex];
+                    score = 0;
+                }
+            } else if (player.gameOver) {
+                frameCount++;
+                if (frameCount % 15 === 0) {
+                    currentColor = getNextColor();
+                }
+                ctx.fillStyle = currentColor;
+                ctx.font = '60px Pixelify Sans';
+                ctx.fillText('Game Over!', canvas.width / 2 - 150, canvas.height / 2 - 50);
+    
+                if (frameCount > 1000) {
+                    gameStarted = false;
+                    difficultySelected = false; // Allow difficulty selection again
                     frameCount = 0;
                     colorIndex = 0;
                     currentColor = colors[colorIndex];
@@ -413,6 +449,10 @@ document.addEventListener('DOMContentLoaded', function () {
         requestAnimationFrame(animate);
     }
 
+    // Initialize the game after sprites are loaded
+    let tallBuildingSprite, medBuildingSprite, smallBuildingSprite;
+
+    // Preload sprites and initialize game objects
     function preloadSprites(callback) {
         let loadedCount = 0;
         const totalSprites = 4;
@@ -443,6 +483,7 @@ document.addEventListener('DOMContentLoaded', function () {
         smallBuildingSprite.src = 'assets/media/small_buildingsprite.png';
     }
 
+    // Start the animation loop after sprites are preloaded
     preloadSprites(() => {
         animate();
     });
