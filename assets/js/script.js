@@ -31,6 +31,16 @@ document.addEventListener('DOMContentLoaded', function () {
         mainMenu: new Audio('assets/media/sounds/mainMenu.mp3')
     };
 
+    function showIntro() {
+        document.getElementById('intro').style.display = 'flex';
+        canvas.style.display = 'none';
+    }
+    
+    function hideIntro() {
+        document.getElementById('intro').style.display = 'none';
+        canvas.style.display = 'block';
+    }
+
     // Set up font for text rendering
     ctx.font = '50px Pixelify Sans';
 
@@ -82,9 +92,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     sounds.backgroundMusic.pause();
                 }
             }
+            // Check collision with buildings
+            this.checkBuildingCollisions();
+        }
+
+        checkBuildingCollisions() {
+            buildings.forEach(building => {
+                if (
+                    this.x + this.width / 2 > building.x &&
+                    this.x - this.width / 2 < building.x + building.width &&
+                    this.y + this.height / 2 > building.y &&
+                    this.y - this.height / 2 < building.y + building.height
+                ) {
+                    this.gameOver = true;
+                    sounds.gameOver.play();
+                    sounds.backgroundMusic.pause();
+                }
+            });
         }
     }
-
 
     // Projectile class
     class Projectile {
@@ -226,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (buildings.length === 0) {
                     score += 100;
                     gameWon = true;
+                    sounds.gameSuccess.play();
                 }
                 sounds.bombHit.play();
             }
@@ -309,7 +336,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('keydown', function (event) {
-        if (!gameStarted) {
+        if (document.getElementById('intro') && document.getElementById('intro').style.display !== 'none') {
+            hideIntro();
+            drawDifficultySelection();
+        } else if (!gameStarted) {
             if (event.key === '1') {
                 selectedDifficulty = 'easy';
                 sounds.levelChange.play();
@@ -327,6 +357,9 @@ document.addEventListener('DOMContentLoaded', function () {
             projectiles.push(new Projectile(player.x, player.y + player.height / 2));
             sounds.bombDrop.play();
             canDropBomb = false;
+        } else if (event.key === 'Escape' && gameStarted) {
+            togglePause();
+
         }
     });
 
@@ -338,14 +371,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Then update your event listeners:
-    document.addEventListener('keydown', function (event) {
-        if (!gameStarted) {
-            // ... existing difficulty selection code ...
-        } else if (event.key === ' ') {
-            dropBomb();
-        }
-    });
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && gameStarted) {
+        togglePause();
+    }
+});
+
+// Then update your event listeners:
+document.addEventListener('keydown', function (event) {
+    if (!gameStarted) {
+        // ... existing difficulty selection code ...
+    } else if (event.key === ' ') {
+        dropBomb();
+    }
+});
 
     canvas.addEventListener('mousedown', function (event) {
         dropBomb();
@@ -358,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function startGame() {
+        hideIntro();
         gameStarted = true;
         gameWon = false;
         player.reset();
@@ -430,7 +470,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentColor = colors[colorIndex];
 
     function animate() {
-        if (!gameStarted) {
+        if (document.getElementById('intro').style.display !== 'none') {
+            // Do nothing, intro is showing
+        } else if (!gameStarted) {
             drawDifficultySelection();
         } else if (!isPaused) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -500,7 +542,14 @@ document.addEventListener('DOMContentLoaded', function () {
         projectileSprite.src = 'assets/media/bomb_sprite.png';
     }
 
+    function showIntro() {
+        document.getElementById('intro').style.display = 'flex';
+        canvas.style.display = 'none';
+    }
+   
+
     preloadSprites(() => {
+        showIntro();
         animate();
     });
 });
