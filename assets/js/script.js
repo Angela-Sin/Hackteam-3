@@ -362,6 +362,18 @@ document.addEventListener('keydown', function (event) {
         sounds.backgroundMusic.play();
     }
 
+    function resetGame() {
+        gameStarted = false;
+        gameWon = false;
+        isPaused = false;
+        score = 0;
+        player.reset();
+        projectiles.length = 0;
+        buildings.length = 0;
+        sounds.backgroundMusic.pause();
+        sounds.backgroundMusic.currentTime = 0;
+    }
+
     function togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
@@ -384,7 +396,9 @@ document.addEventListener('keydown', function (event) {
     });
 
     document.getElementById('quitButton').addEventListener('click', function() {
-        window.location.href = "mainmenu.html";
+        resetGame();
+        hidePauseMenu();
+        drawDifficultySelection();
     });
 
     document.addEventListener('keydown', function(event) {
